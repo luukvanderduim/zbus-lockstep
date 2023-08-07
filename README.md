@@ -1,5 +1,7 @@
 # zbus-lockstep
 
+[![build-ci](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
+
 Keep type definitions in lockstep with DBus XML descriptions, with [`zbus`](<https://github.com/dbus2/zbus>).
 
 This provides means to match the signature of [`<T as zvariant::Type>::signature()`](https://docs.rs/zvariant/latest/zvariant/trait.Type.html#tymethod.signature) with a corresponding signature from a DBus XML file.
@@ -47,7 +49,7 @@ This means we can now call `<Node as Type::signature()`, which will return a [`z
 The test below shows how `zbus-lockstep` may be used given what we know about the type.
 
 ```rust
-    use 
+    use zbus_lockstep;
 
     #[test]
     fn test_get_signature_of_cache_remove_accessible() {
@@ -85,4 +87,4 @@ This crate started out as a fork from Tait Hoyem's [zbus-xml-match](https://gith
 
 ## LICENSE
 
-MIT
+MIT OR APACHE-2.0
