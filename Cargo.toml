@@ -21,3 +21,4 @@ zbus = { version = "3", features = ["xml"] }
 
 [dev-dependencies]
 tempfile = "3.7"
+version-sync = "0.9"
