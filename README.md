@@ -87,4 +87,4 @@ This crate started out as a fork from Tait Hoyem's [zbus-xml-match](https://gith
 
 ## LICENSE
 
-MIT OR APACHE-2.0
+MIT
