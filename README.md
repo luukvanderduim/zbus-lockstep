@@ -1,6 +1,9 @@
 # zbus-lockstep
 
-[![build-ci](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
+[![CI](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
+![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+[![crates-io](https://img.shields.io/crates/v/zbus-lockstep.svg)](https://crates.io/crates/zbus-lockstep)
+[![api-docs](https://docs.rs/zbus-lockstep/badge.svg)](https://docs.rs/zbus-lockstep)
 
 Keep type definitions in lockstep with DBus XML descriptions, with [`zbus`](<https://github.com/dbus2/zbus>).
 
