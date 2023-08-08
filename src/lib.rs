@@ -1,3 +1,14 @@
+//! # zbus-lockstep
+//!
+//! `zbus-lockstep` is a library for retrieving `DBus` type signatures from XML descriptions
+//! and comparing those with the signature of your type signatures to ensure that they are
+//! compatible.
+//!
+//! `zbus-lockstep`'s intended use is in tests, such that it will assure your types conform
+//! to XML definitions with `cargo test` and/or during CI-runs. If you are using `zbus-lockstep`
+//! in your tests, it is sufficient to add it as a dev-dependency.
+//!
+//! `zbus-lockstep` is a work in progress.
 #![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.0")]
 #![allow(clippy::missing_errors_doc)]
 
@@ -252,6 +263,59 @@ pub fn get_method_return_type<'a>(
 /// If you provide an argument name, then the signature of that argument is returned.
 /// If you do not provide an argument name, then the signature of all arguments to the call is
 /// returned.
+///
+/// # Examples
+///
+/// ```rust
+/// use std::fs::File;
+/// use std::collections::HashMap;
+/// use std::io::{Seek, SeekFrom, Write};
+/// use tempfile::tempfile;
+/// use zbus::zvariant::{Type, Value};
+/// use zbus_lockstep::get_method_args_type;
+/// use zbus_lockstep::assert_eq_signatures;
+/// use zbus_lockstep::signatures_are_eq;
+///
+/// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+/// <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+///  <interface name="org.freedesktop.Notifications">
+///    <method name="Notify">
+///      <arg type="s" name="app_name" direction="in"/>
+///      <arg type="u" name="replaces_id" direction="in"/>
+///      <arg type="s" name="app_icon" direction="in"/>
+///      <arg type="s" name="summary" direction="in"/>
+///      <arg type="s" name="body" direction="in"/>
+///      <arg type="as" name="actions" direction="in"/>
+///      <arg type="a{sv}" name="hints" direction="in"/>
+///      <arg type="i" name="expire_timeout" direction="in"/>
+///      <arg type="u" name="id" direction="out"/>
+///    </method>
+///  </interface>
+/// </node>
+/// "#;
+///
+/// #[derive(Debug, PartialEq, Type)]
+/// struct Notification<'a> {
+///    app_name: String,
+///    replaces_id: u32,
+///    app_icon: String,
+///    summary: String,
+///    body: String,
+///    actions: Vec<String>,
+///    hints: HashMap<String, Value<'a>>,  
+///    expire_timeout: i32,
+/// }
+///
+/// let mut xml_file = tempfile().unwrap();
+/// xml_file.write_all(xml.as_bytes()).unwrap();
+/// xml_file.seek(SeekFrom::Start(0)).unwrap();
+///
+/// let interface_name = "org.freedesktop.Notifications";
+/// let member_name = "Notify";
+///     
+/// let signature = get_method_args_type(xml_file, interface_name, member_name, None).unwrap();
+/// assert_eq_signatures!(&signature, &Notification::signature());
+/// ```
 pub fn get_method_args_type<'a>(
     mut xml: impl Read,
     interface_name: &str,

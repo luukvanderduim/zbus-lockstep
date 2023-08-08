@@ -18,6 +18,13 @@ The `XML` descriptions may act as a shared overarching frame of reference or "si
 
 ## How
 
+Add `zbus-lockstep` to `Cargo.toml`'s dev-dependencies:
+
+```toml
+[dev-dependencies]
+zbus-lockstep = "0.1.0"
+```
+
 Consider the followwing XML description,
 an interface with a single, simple signal in the `Cache.xml` file:
 
@@ -62,10 +69,10 @@ The test below shows how `zbus-lockstep` may be used given what we know about th
     }
 ```
 
-Obviously, the user here needs to take care and ensure that the `XML` descriptions that are in use,
-are valid and the most current available.
+Obviously, the user here needs to take care to ensure that the `XML` descriptions that are in use,
+are indeed currently valid and the most recent available.
 
-## ToDo
+## To-do
 
 - [ ] Provide proc-macro to derive a validation
 
