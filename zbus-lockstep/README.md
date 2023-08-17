@@ -75,22 +75,6 @@ The test below shows how `zbus-lockstep` may be used given what we know about th
 Obviously, the user here needs to take care to ensure that the `XML` descriptions that are in use,
 are indeed currently valid and the most recent available.
 
-## To-do
-
-- [ ] Provide proc-macro to derive a validation
-
-```rust
-#[derive(Type)] 
-#[validate(signal = "Activate", path = "../xml/introspected.xml")]
-pub struct ActivateEvent {
-    event: String,
-    serial: u32,
-    // 
-}
-```
-
-Caveat: Requires a sub-crate.
-
 ## Acknowledgement
 
 This crate started out as a fork from Tait Hoyem's [zbus-xml-match](https://github.com/TTWNO/zbus-xml-match).

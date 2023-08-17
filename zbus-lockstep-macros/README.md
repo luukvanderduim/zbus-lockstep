@@ -1,7 +1,9 @@
 # zbus-lockstep-macros
 
-[![crates-io](https://img.shields.io/crates/v/zbus-lockstep-macros.svg)](https://crates.io/crates/zbus-lockstep-macros)
-[![api-docs](https://docs.rs/zbus-lockstep-macros/badge.svg)](https://docs.rs/zbus-lockstep-macros)
+[![CI](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
+![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+[![crates-io](https://img.shields.io/crates/v/zbus-lockstep.svg)](https://crates.io/crates/zbus-lockstep)
+[![api-docs](https://docs.rs/zbus-lockstep/badge.svg)](https://docs.rs/zbus-lockstep)
 
 More conveniently keep type definitions in in lockstep with DBus XML descriptions using [`zbus`](<https://github.com/dbus2/zbus>) and [`zbus-lockstep`](<https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep>).
 
