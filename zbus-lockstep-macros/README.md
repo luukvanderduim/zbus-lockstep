@@ -3,25 +3,45 @@
 [![crates-io](https://img.shields.io/crates/v/zbus-lockstep-macros.svg)](https://crates.io/crates/zbus-lockstep-macros)
 [![api-docs](https://docs.rs/zbus-lockstep-macros/badge.svg)](https://docs.rs/zbus-lockstep-macros)
 
-More conveniently keep type definitions in in lockstep with DBus XML descriptions - with [`zbus`](<https://github.com/dbus2/zbus>) and [`zbus-lockstep`](<https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep>).
+More conveniently keep type definitions in in lockstep with DBus XML descriptions using [`zbus`](<https://github.com/dbus2/zbus>) and [`zbus-lockstep`](<https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep>).
 
 This extends `zbus-lockstep` to more succinctly and conveniently match the signature of [`<T as zvariant::Type>::signature()`](https://docs.rs/zvariant/latest/zvariant/trait.Type.html#tymethod.signature) with a corresponding signature from a DBus XML file.
 
-See for the motivation the `zbus-lockstep` crate.
+See for the motivation the [`zbus-lockstep`](https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep) crate.
 
-## To-do
+## Use
 
-- [ ] Provide proc-macro to derive a validation
+Add `zbus-lockstep-macros` to `Cargo.toml`'s dev-dependencies:
+
+```toml
+[dev-dependencies]
+zbus-lockstep-macros = "0.1.0"
+```
+
+If the `DBus` XML descriptions can be found in the crates root,
+in either `xml/` or `XML/`, validating the type can be as easy as:
 
 ```rust
-#[derive(Type)] 
-#[validate(signal = "Activate", path = "../xml/introspected.xml")]
-pub struct ActivateEvent {
-    event: String,
-    serial: u32,
-    // 
+ use zbus_lockstep_macros::validate;
+ use zbus::zvariant::Type;
+
+ #[validate]
+ #[derive(Type)]
+ struct BirthdayEvent {
+    name: String,
+    new_age: u8,
 }
 ```
+
+Note that the macro assumes that the member name is contained in the struct name.
+You can provide it you have another naming-scheme in use.
+
+Also, it may be necessary to disambiguate if multiple interfaces across the `DBus`
+descriptions provide equally named signals.
+
+Any of the arguments are optional.
+
+`#[validate(xml: <xml_path>, interface: <interface_name>, member: <member_name>)]`
 
 ## LICENSE
 
