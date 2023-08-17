@@ -1207,6 +1207,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "zbus-lockstep-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.28",
+ "version-sync",
+ "zbus",
+ "zbus-lockstep",
+]
+
+[[package]]
 name = "zbus_macros"
 version = "3.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
