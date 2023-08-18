@@ -6,7 +6,7 @@
 //!
 //! `zbus-lockstep`'s intended use is in tests, such that it will assure your types conform
 //! to XML definitions with `cargo test`.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.1")]
 #![allow(clippy::missing_errors_doc)]
 
 pub mod marshall;

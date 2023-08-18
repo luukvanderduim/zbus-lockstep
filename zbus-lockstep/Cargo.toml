@@ -1,8 +1,11 @@
 [package]
 name = "zbus-lockstep"
-authors = ["Luuk van der Duim <luukvanderduim@gmail.com>", "Tait Hoyem<tait@tait.tech>"]
+authors = [
+    "Luuk van der Duim <luukvanderduim@gmail.com>",
+    "Tait Hoyem<tait@tait.tech>",
+]
 description = "Keep types in lockstep with DBus XML definitions"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 categories = ["API-bindings"]
