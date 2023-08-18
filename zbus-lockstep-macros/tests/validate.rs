@@ -5,7 +5,7 @@ use zbus::zvariant::{OwnedObjectPath, Type};
 use zbus_lockstep_macros::validate;
 
 #[test]
-fn test_validate_macro_env_variable_set() {
+fn test_validate_macro_path_as_env_variable() {
     // set env variable to enable validation
     std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
 
@@ -18,7 +18,7 @@ fn test_validate_macro_env_variable_set() {
 }
 
 #[test]
-fn test_validate_macro_t() {
+fn test_validate_macro_path_as_arg() {
     #[validate(xml: "zbus-lockstep-macros/tests/xml")]
     #[derive(Debug, Type)]
     struct AddNodeEvent {
