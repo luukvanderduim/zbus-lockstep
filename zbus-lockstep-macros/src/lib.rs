@@ -1,6 +1,6 @@
 //! # zbus-lockstep-macros
 //!
-//! This crate provides the `validate` macro that builds on `zbus-lockstep`.
+//! This provides the `validate` macro that builds on `zbus-lockstep`.
 #![doc(html_root_url = "https://docs.rs/zbus-lockstep-macros/0.1.0")]
 
 type Result<T> = std::result::Result<T, syn::Error>;
@@ -11,32 +11,60 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Token};
 
-/// Validate a struct's type signature against signal body type.
+/// Validate a struct's type signature against XML signal body type.
 ///
-/// Tries to get the signal body type from an XML file using the least amount
-/// of information possible.
+/// Retrieves the signal body type from a (collection of) XML file(s) and compares it to the
+/// struct's type signature.
+///
+/// If the XML file(s) are found in the default location, `xml/` or `XML/` of the crate root,
+/// or provided as environment variable, `ZBUS_LOCKSTEP_XML_PATH`, the macro can be used without
+/// arguments.
+///
 ///
 /// # Arguments
 ///
-/// ## `xml`
+/// `#[validate]` can take three optional arguments:
 ///
-/// Assumes XML file(s) in `xml/` or `XML/` of the crate root,
-/// otherwise the path to the XML file must be provided.
+/// * `xml`: Path to XML file(s) containing the signal definition.
+/// * `interface`: Interface name of the signal.
+/// * `signal`: Signal name.
 ///
-/// Alternatively, you can provide the XML file as environment variable,
-/// `ZBUS_LOCKSTEP_XML_PATH`, which will precede the path argument and the default path.
+/// `#[validate(xml: <xml_path>, interface: <interface_name>, member: <member_name>)]`
+///
+/// ## `xml_path`
+///
+/// Without an argument, the macro looks for XML file(s) in `xml/` or `XML/` of the crate root.
+/// If the definitions are to be found elsewhere, there are two options:
+///
+/// Use the `xml` argument:
+///
+/// ```rust
+/// #[validate(xml: "path/to/xml")]
+/// ```
+///
+///
+/// Alternatively, you can provide the XML directory path as environment variable,
+/// `ZBUS_LOCKSTEP_XML_PATH`, which will override both default and the path argument.
 ///
 /// ## `interface`
 ///
-/// If multiple interfaces contain a signal name that is contained in
-/// the structs' identifier, the macro will fail and you can provide an
-/// interface name to disambiguate.
+/// If more than one signal with the same name is defined in the XML file(s),
+/// the macro will fail and you can provide an interface name to disambiguate.
+///
+/// ```rust
+/// #[validate(interface: "org.freedesktop.DBus.Properties")]
+/// ```
+///
 ///
 /// ## `signal`
 ///
-/// If a custom signal name is required, it may be provided `signal:`.
+/// If a custom signal name is desired, you can be provided using `signal:`.
 ///
-/// `#[validate(xml: <xml_path>, interface: <interface_name>, member: <member_name>)]`
+/// ```rust
+/// #[validate(signal: "RemoveNode")]
+/// struct DeleteEvent
+/// ```
+///
 ///
 /// # Examples
 ///
@@ -47,7 +75,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// #[validate(xml: "zbus-lockstep-macros/tests/xml")]
 /// #[derive(Type)]
-/// struct RemoveNodeHappening {
+/// struct RemoveNodeSignal {
 ///    name: String,
 ///    path: OwnedObjectPath,
 /// }
@@ -67,7 +95,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
     resolve_xml_path(&mut xml);
 
-    // If no path could be found, return a helpful error message.
+    // If the path could not be resolved, emit a helpful compiler error.
     if xml.is_none() {
         let mut path = std::env::current_dir().unwrap();
         path.push("xml");
