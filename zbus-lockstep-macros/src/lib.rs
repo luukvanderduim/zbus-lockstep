@@ -38,8 +38,16 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// Use the `xml` argument:
 ///
-/// ```rust
-/// #[validate(xml: "path/to/xml")]
+/// ```
+/// # use zbus_lockstep_macros::validate;
+/// # use zbus::zvariant::{OwnedObjectPath, Type};
+///
+/// #[validate(xml: "zbus-lockstep-macros/tests/xml")]
+/// #[derive(Type)]
+/// struct RemoveNodeSignal {
+///    name: String,
+///    path: OwnedObjectPath,
+/// }
 /// ```
 ///
 ///
@@ -52,7 +60,17 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// the macro will fail and you can provide an interface name to disambiguate.
 ///
 /// ```rust
-/// #[validate(interface: "org.freedesktop.DBus.Properties")]
+/// # // set env var to find XML file
+/// # std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
+/// # use zbus_lockstep_macros::validate;
+/// # use zbus::zvariant::{OwnedObjectPath, Type};
+///
+/// #[validate(interface: "org.example.Node")]
+/// #[derive(Type)]
+/// struct RemoveNodeSignal {
+///    name: String,
+///    path: OwnedObjectPath,
+/// }
 /// ```
 ///
 ///
@@ -61,8 +79,17 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// If a custom signal name is desired, you can be provided using `signal:`.
 ///
 /// ```rust
+/// # // set env var to find XML file
+/// # std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
+/// # use zbus_lockstep_macros::validate;
+/// # use zbus::zvariant::{OwnedObjectPath, Type};
+///
 /// #[validate(signal: "RemoveNode")]
-/// struct DeleteEvent
+/// #[derive(Type)]
+/// struct RemoveNodeSignal {
+///    name: String,
+///    path: OwnedObjectPath,
+/// }
 /// ```
 ///
 ///
@@ -90,8 +117,6 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let item_name = item_struct.ident.to_string();
 
     let mut xml = args.xml;
-    let interface = args.interface;
-    let signal_arg = args.signal;
 
     resolve_xml_path(&mut xml);
 
@@ -115,8 +140,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
             .into();
     }
 
-    // Safe to unwrap because we checked that it is not `None`.
-    let xml = xml.unwrap();
+    let xml = xml.expect("XML path should be resolved by now.");
 
     // Store each file's XML as a string in a with the XML's file path as key.
     let mut xml_files: HashMap<PathBuf, String> = HashMap::new();
@@ -134,8 +158,8 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     // Iterate over the directory and store each XML file as a string.
-    for file in read_dir.unwrap() {
-        let file = file.expect("Failed to read XML file");
+    for file in read_dir.expect("ReadDir: Failed to read XML directory") {
+        let file = file.expect("DirEntry: Failed to read XML file");
 
         if file.path().extension().expect("File has no extension.") == "xml" {
             let xml =
@@ -145,41 +169,39 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     // These are later needed to call `get_signal_body_type`.
+    let mut xml_file_path = None;
+    let mut interface_name = None;
     let mut signal_name = None;
-    let mut interface_name = interface;
-    let mut xml_path = None;
 
     // Iterate over `xml_files` and find the signal that is contained in the struct's name.
     // Or if `signal_arg` is provided, use that.
     for (path_key, xml_string) in xml_files {
         let node = zbus::xml::Node::from_str(&xml_string).expect("Failed to parse XML file");
 
-        let interfaces = node.interfaces();
-        for interface in interfaces {
-            let signals = interface.signals();
-            for signal in signals {
+        for interface in node.interfaces() {
+            // We were called with an interface argument, so if the interface name does not match,
+            // skip it.
+            if args.interface.is_some() && interface.name() != args.interface.as_ref().unwrap() {
+                continue;
+            }
+
+            for signal in interface.signals() {
+                if args.signal.is_some() && signal.name() != args.signal.as_ref().unwrap() {
+                    continue;
+                }
+
                 let xml_signal_name = signal.name();
 
-                if signal_arg.is_some() && signal_name == signal_arg {
-                    // If in an earlier iteration we already found a signal with the same name,
-                    // error.
-                    if interface_name.is_some() {
-                        return syn::Error::new(
-                            proc_macro2::Span::call_site(),
-                            "Multiple interfaces with the same signal name. Please disambiguate.",
-                        )
-                        .to_compile_error()
-                        .into();
-                    }
+                if args.signal.is_some() && xml_signal_name == args.signal.as_ref().unwrap() {
                     interface_name = Some(interface.name().to_string());
                     signal_name = Some(xml_signal_name.to_string());
-                    xml_path = Some(path_key.clone());
+                    xml_file_path = Some(path_key.clone());
+                    continue;
                 }
 
                 if item_name.contains(xml_signal_name) {
-                    // If in an earlier iteration we already found a signal with the same name,
-                    // error.
-                    if interface_name.is_some() {
+                    // If we have found a signal with the same name in an earlier iteration:
+                    if interface_name.is_some() && signal_name.is_some() {
                         return syn::Error::new(
                             proc_macro2::Span::call_site(),
                             "Multiple interfaces with the same signal name. Please disambiguate.",
@@ -189,54 +211,33 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
                     }
                     interface_name = Some(interface.name().to_string());
                     signal_name = Some(xml_signal_name.to_string());
-                    xml_path = Some(path_key.clone());
+                    xml_file_path = Some(path_key.clone());
                 }
             }
         }
     }
 
-    // Lets be nice and provide a helpful error message.
+    // Lets be nice and provide a informative compiler error message.
+
+    // We searched all XML files and did not find a match.
     if interface_name.is_none() {
         return syn::Error::new(
             proc_macro2::Span::call_site(),
             format!(
-                "No interface with signal name '{}' found.",
-                signal_arg.unwrap_or_else(|| item_name.clone())
+                "No interface matching signal name '{}' found.",
+                args.signal.unwrap_or_else(|| item_name.clone())
             ),
         )
         .to_compile_error()
         .into();
     }
 
-    if signal_name.is_none() {
-        return syn::Error::new(
-            proc_macro2::Span::call_site(),
-            format!(
-                "No signal with name '{}' found.",
-                signal_arg.unwrap_or_else(|| item_name.clone())
-            ),
-        )
-        .to_compile_error()
-        .into();
-    }
+    // If we did find a matching interface we have also set `xml_file_path` and `signal_name`.
 
-    if xml_path.is_none() {
-        return syn::Error::new(
-            proc_macro2::Span::call_site(),
-            format!(
-                "No XML file with signal name '{}' found.",
-                signal_arg.unwrap_or_else(|| item_name.clone())
-            ),
-        )
-        .to_compile_error()
-        .into();
-    }
-
-    // Safe to unwrap because we checked that they are not `None`.
-    let interface_name = interface_name.unwrap();
-    let signal_name = signal_name.unwrap();
-    let xml_path = xml_path.unwrap();
-    let xml_path = xml_path.to_str().unwrap();
+    let interface_name = interface_name.expect("Interface should have been found in search loop.");
+    let signal_name = signal_name.expect("Signal should have been found in search loop.");
+    let xml_file_path = xml_file_path.expect("XML file path should be found in search loop.");
+    let xml_file_path = xml_file_path.to_str();
 
     // Create a block to return the item struct with a uniquely named validation test.
     let test_name = format!("test_{}_type_signature", item_name);
@@ -259,7 +260,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
             use std::io::Cursor;
 
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(
-                Cursor::new(#xml_path.as_bytes()),
+                Cursor::new(#xml_file_path.as_bytes()),
                 #interface_name,
                 #signal_name,
                 None
@@ -330,7 +331,7 @@ impl syn::parse::Parse for ValidateArgs {
 fn resolve_xml_path(xml: &mut Option<PathBuf>) {
     // Try to find the XML file in the default locations.
     if xml.is_none() {
-        let mut path = std::env::current_dir().unwrap();
+        let mut path = std::env::current_dir().expect("Failed to get current directory");
 
         path.push("xml");
         if path.exists() {

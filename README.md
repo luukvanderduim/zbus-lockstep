@@ -2,8 +2,6 @@
 
 [![CI](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
-[![crates-io](https://img.shields.io/crates/v/zbus-lockstep.svg)](https://crates.io/crates/zbus-lockstep)
-[![api-docs](https://docs.rs/zbus-lockstep/badge.svg)](https://docs.rs/zbus-lockstep)
 
 This repository is home to `zbus-lockstep` and `zbus-lockstep-macros`.
 

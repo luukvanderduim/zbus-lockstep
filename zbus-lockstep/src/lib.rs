@@ -5,10 +5,7 @@
 //! compatible.
 //!
 //! `zbus-lockstep`'s intended use is in tests, such that it will assure your types conform
-//! to XML definitions with `cargo test` and/or during CI-runs. If you are using `zbus-lockstep`
-//! in your tests, it is sufficient to add it as a dev-dependency.
-//!
-//! `zbus-lockstep` is a work in progress.
+//! to XML definitions with `cargo test`.
 #![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.0")]
 #![allow(clippy::missing_errors_doc)]
 
