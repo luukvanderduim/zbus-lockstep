@@ -42,7 +42,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
 ///
-/// #[validate(xml: "zbus-lockstep-macros/tests/xml")]
+/// #[validate(xml: "./xml")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
 ///    name: String,
@@ -100,7 +100,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// use zbus_lockstep_macros::validate;
 /// use zbus::zvariant::{OwnedObjectPath, Type};
 ///
-/// #[validate(xml: "zbus-lockstep-macros/tests/xml")]
+/// #[validate(xml: "./xml")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
 ///    name: String,
@@ -117,7 +117,6 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let item_name = item_struct.ident.to_string();
 
     let mut xml = args.xml;
-
     resolve_xml_path(&mut xml);
 
     // If the path could not be resolved, emit a helpful compiler error.
@@ -256,8 +255,11 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
     let interface_name = interface_name.expect("Interface should have been found in search loop.");
     let signal_name = signal_name.expect("Signal should have been found in search loop.");
+
     let xml_file_path = xml_file_path.expect("XML file path should be found in search loop.");
-    let xml_file_path = xml_file_path.to_str();
+    let xml_file_path = xml_file_path
+        .to_str()
+        .expect("XML file path should be valid UTF-8");
 
     // Create a block to return the item struct with a uniquely named validation test.
     let test_name = format!("test_{}_type_signature", item_name);
@@ -274,13 +276,13 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
         #[test]
         fn #test_name() {
-            use zbus::zvariant;
-            use zbus::zvariant::Type;
-            use zbus_lockstep::signatures_are_eq;
-            use std::io::Cursor;
+            use zbus::zvariant::{self, Type};
+            use zbus_lockstep::{signatures_are_eq, assert_eq_signatures};
+
+            let xml_file = std::fs::File::open(#xml_file_path).expect(#xml_file_path);
 
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(
-                std::fs::File::open(#xml_file_path).expect("Failed to open XML file"),
+                xml_file,
                 #interface_name,
                 #signal_name,
                 None
@@ -288,7 +290,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
             let item_signature_from_struct = <#item_struct_name as zvariant::Type>::signature();
 
-            zbus_lockstep::assert_eq_signatures!(&item_signature_from_xml, &item_signature_from_struct);
+            assert_eq_signatures!(&item_signature_from_xml, &item_signature_from_struct);
         }
     };
 
@@ -347,27 +349,38 @@ impl syn::parse::Parse for ValidateArgs {
     }
 }
 
-// TODO: Hardcoded paths may not be ideal.
 fn resolve_xml_path(xml: &mut Option<PathBuf>) {
-    // Try to find the XML file in the default locations.
-    if xml.is_none() {
+    let mut xml_path = xml.clone();
+
+    if xml_path.is_none() {
         let mut path = std::env::current_dir().expect("Failed to get current directory");
 
         path.push("xml");
         if path.exists() {
-            *xml = Some(path.clone());
+            xml_path = Some(path.clone());
         }
 
         path.pop();
+
         path.push("XML");
         if path.exists() {
-            *xml = Some(path);
+            xml_path = Some(path);
         }
     }
 
     // If the XML file is provided as environment variable.
     // This will override the default, so the env variable better be valid.
     if let Ok(env_path_xml) = std::env::var("ZBUS_LOCKSTEP_XML_PATH") {
-        *xml = Some(PathBuf::from(env_path_xml));
+        xml_path = Some(PathBuf::from(env_path_xml));
     }
+
+    // If `xml_path` is still `None`, we have not found a valid XML path and
+    // we should return early.
+    if xml_path.is_none() {
+        return;
+    }
+
+    let mut xml_path = xml_path.expect("XML path should be resolved.");
+    xml_path = std::fs::canonicalize(xml_path).expect("Failed to canonicalize XML path");
+    *xml = Some(xml_path);
 }
