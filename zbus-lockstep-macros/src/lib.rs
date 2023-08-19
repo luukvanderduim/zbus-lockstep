@@ -5,6 +5,9 @@
 
 type Result<T> = std::result::Result<T, syn::Error>;
 
+const DEFAULT_XML_PATH: &str = "xml";
+const DEFAULT_XML_PATH_ALT: &str = "XML";
+
 use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use proc_macro::TokenStream;
@@ -122,11 +125,11 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     // If the path could not be resolved, emit a helpful compiler error.
     if xml.is_none() {
         let mut path = std::env::current_dir().unwrap();
-        path.push("xml");
+        path.push(DEFAULT_XML_PATH);
         let path = path.to_str().unwrap();
 
         let mut alt_path = std::env::current_dir().unwrap();
-        alt_path.push("XML");
+        alt_path.push(DEFAULT_XML_PATH_ALT);
         let alt_path = alt_path.to_str().unwrap();
 
         let error_message = format!(
@@ -355,14 +358,14 @@ fn resolve_xml_path(xml: &mut Option<PathBuf>) {
     if xml_path.is_none() {
         let mut path = std::env::current_dir().expect("Failed to get current directory");
 
-        path.push("xml");
+        path.push(DEFAULT_XML_PATH);
         if path.exists() {
             xml_path = Some(path.clone());
         }
 
         path.pop();
 
-        path.push("XML");
+        path.push(DEFAULT_XML_PATH_ALT);
         if path.exists() {
             xml_path = Some(path);
         }
