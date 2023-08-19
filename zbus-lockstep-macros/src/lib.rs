@@ -158,13 +158,18 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     }
 
     // Iterate over the directory and store each XML file as a string.
-    for file in read_dir.expect("ReadDir: Failed to read XML directory") {
-        let file = file.expect("DirEntry: Failed to read XML file");
+    for entry in read_dir.expect("Failed to read XML directory") {
+        let entry = entry.expect("Failed to read XML file");
 
-        if file.path().extension().expect("File has no extension.") == "xml" {
+        // Skip directories.
+        if entry.path().is_dir() {
+            continue;
+        }
+
+        if entry.path().extension().expect("File has no extension.") == "xml" {
             let xml =
-                std::fs::read_to_string(file.path()).expect("Unable to read XML file to string");
-            xml_files.insert(file.path().clone(), xml);
+                std::fs::read_to_string(entry.path()).expect("Unable to read XML file to string");
+            xml_files.insert(entry.path().clone(), xml);
         }
     }
 
