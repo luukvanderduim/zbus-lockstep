@@ -107,11 +107,6 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///    path: OwnedObjectPath,
 /// }
 /// ```
-///
-/// ## Note on order attribute macros
-///
-/// Attribute macros are expanded inside-out, so the `validate` macro must be
-/// called before the `derive(Type)` macro.
 #[proc_macro_attribute]
 pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse the macro arguments.
