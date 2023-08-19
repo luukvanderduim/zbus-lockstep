@@ -181,7 +181,20 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     // Iterate over `xml_files` and find the signal that is contained in the struct's name.
     // Or if `signal_arg` is provided, use that.
     for (path_key, xml_string) in xml_files {
-        let node = zbus::xml::Node::from_str(&xml_string).expect("Failed to parse XML file");
+        let node = zbus::xml::Node::from_str(&xml_string);
+
+        if node.is_err() {
+            return syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!(
+                    "Failed to parse XML file: \"{}\" Err: {}",
+                    path_key.to_str().unwrap(),
+                    node.err().unwrap()
+                ),
+            )
+            .to_compile_error()
+            .into();
+        }
 
         for interface in node.interfaces() {
             // We were called with an interface argument, so if the interface name does not match,
