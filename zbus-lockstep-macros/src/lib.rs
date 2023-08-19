@@ -196,6 +196,8 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
             .into();
         }
 
+        let node = node.unwrap();
+
         for interface in node.interfaces() {
             // We were called with an interface argument, so if the interface name does not match,
             // skip it.
@@ -278,7 +280,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
             use std::io::Cursor;
 
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(
-                Cursor::new(#xml_file_path.as_bytes()),
+                std::fs::File::open(#xml_file_path).expect("Failed to open XML file"),
                 #interface_name,
                 #signal_name,
                 None
