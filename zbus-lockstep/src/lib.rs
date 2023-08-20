@@ -9,7 +9,7 @@
 #![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.1")]
 #![allow(clippy::missing_errors_doc)]
 
-pub mod marshall;
+mod marshall;
 use std::io::Read;
 
 pub use marshall::signatures_are_eq;
