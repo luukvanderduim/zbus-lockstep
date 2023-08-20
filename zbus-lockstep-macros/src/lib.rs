@@ -120,7 +120,28 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let item_name = item_struct.ident.to_string();
 
     let mut xml = args.xml;
-    resolve_xml_path(&mut xml);
+
+    // If no XML path is provided, try to find the default XML path.
+    if xml.is_none() {
+        let mut path = std::env::current_dir().expect("Failed to get current directory");
+
+        path.push(DEFAULT_XML_PATH);
+        if path.exists() {
+            xml = Some(path.clone());
+        }
+
+        path.pop();
+
+        path.push(DEFAULT_XML_PATH_ALT);
+        if path.exists() {
+            xml = Some(path);
+        }
+    }
+
+    // Override the default, or argument path if the environment variable is set.
+    if let Ok(env_path_xml) = std::env::var("ZBUS_LOCKSTEP_XML_PATH") {
+        xml = Some(PathBuf::from(env_path_xml));
+    }
 
     // If the path could not be resolved, emit a helpful compiler error.
     if xml.is_none() {
@@ -142,7 +163,10 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
             .into();
     }
 
+    // Unwrap the XML path and canonicalize it.
+    // Reason: The current working directory might differ between the macro call and the test.
     let xml = xml.expect("XML path should be resolved by now.");
+    let xml = std::fs::canonicalize(xml).expect("Failed to canonicalize XML path");
 
     // Store each file's XML as a string in a with the XML's file path as key.
     let mut xml_files: HashMap<PathBuf, String> = HashMap::new();
@@ -350,40 +374,4 @@ impl syn::parse::Parse for ValidateArgs {
             signal,
         })
     }
-}
-
-fn resolve_xml_path(xml: &mut Option<PathBuf>) {
-    let mut xml_path = xml.clone();
-
-    if xml_path.is_none() {
-        let mut path = std::env::current_dir().expect("Failed to get current directory");
-
-        path.push(DEFAULT_XML_PATH);
-        if path.exists() {
-            xml_path = Some(path.clone());
-        }
-
-        path.pop();
-
-        path.push(DEFAULT_XML_PATH_ALT);
-        if path.exists() {
-            xml_path = Some(path);
-        }
-    }
-
-    // If the XML file is provided as environment variable.
-    // This will override the default, so the env variable better be valid.
-    if let Ok(env_path_xml) = std::env::var("ZBUS_LOCKSTEP_XML_PATH") {
-        xml_path = Some(PathBuf::from(env_path_xml));
-    }
-
-    // If `xml_path` is still `None`, we have not found a valid XML path and
-    // we should return early.
-    if xml_path.is_none() {
-        return;
-    }
-
-    let mut xml_path = xml_path.expect("XML path should be resolved.");
-    xml_path = std::fs::canonicalize(xml_path).expect("Failed to canonicalize XML path");
-    *xml = Some(xml_path);
 }
