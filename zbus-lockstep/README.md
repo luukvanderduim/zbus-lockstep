@@ -28,8 +28,7 @@ Add `zbus-lockstep` to `Cargo.toml`'s dev-dependencies:
 zbus-lockstep = "0.1.1"
 ```
 
-Consider the followwing XML description,
-an interface with a single, simple signal in the `Cache.xml` file:
+Consider the followwing XML description, an interface with a single signal.
 
 ```XML
 <node>
@@ -72,8 +71,7 @@ The test below shows how `zbus-lockstep` may be used given what we know about th
     }
 ```
 
-Obviously, the user here needs to take care to ensure that the `XML` descriptions that are in use,
-are indeed currently valid and the most recent available.
+Obviously, when using XML descriptions as single point of reference, you should ensure that the descriptions in use are always the most recent available.
 
 ## Acknowledgement
 
