@@ -5,18 +5,23 @@
 [![crates-io](https://img.shields.io/crates/v/zbus-lockstep.svg)](https://crates.io/crates/zbus-lockstep)
 [![api-docs](https://docs.rs/zbus-lockstep/badge.svg)](https://docs.rs/zbus-lockstep)
 
-More conveniently keep type definitions in in lockstep with DBus XML descriptions using [`zbus`](<https://github.com/dbus2/zbus>) and [`zbus-lockstep`](<https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep>).
+`zbus-lockstep-macros` extends `zbus-lockstep` to match the signature of signal types [`<T as zvariant::Type>::signature()`](https://docs.rs/zvariant/latest/zvariant/trait.Type.html#tymethod.signature) with a corresponding signature from a DBus XML file more conveniently and succinctly.
 
-This extends `zbus-lockstep` to more succinctly and conveniently match the signature of [`<T as zvariant::Type>::signature()`](https://docs.rs/zvariant/latest/zvariant/trait.Type.html#tymethod.signature) with a corresponding signature from a DBus XML file.
+## Motivation
 
-See for the motivation the [`zbus-lockstep`](https://github.com/luukvanderduim/zbus-lockstep/zbus-lockstep) crate.
+In the context of IPC over `DBus`, especially where there are multiple implementations of servers and/or clients communicating, it is necessary for each implementation to send what others expect and that expectations are in accordance with what is sent over the bus.
+
+The `XML` protocol-descriptions may act as a shared frame of reference or "single source of all truth" for all implementers.
+Having a single point of reference helps all implementers meet expectations on protocol conformance.
+
+Keeping the types you send over `DBus` in lockstep with currently valid protocol-descriptions will reduce chances of miscommunication or failure to communicate.
 
 ## Use
 
-Add `zbus-lockstep-macros` to `Cargo.toml`'s dev-dependencies:
+Add `zbus-lockstep-macros` to `Cargo.toml`'s dependencies:
 
 ```toml
-[dev-dependencies]
+[dependencies]
 zbus-lockstep-macros = "0.1.0"
 ```
 
@@ -36,14 +41,16 @@ in either `xml/` or `XML/`, validating the type can be as easy as:
 ```
 
 Note that the macro assumes that the member name is contained in the struct name.
-You can provide it you have another naming-scheme in use.
+You can provide the member name if you have another naming-scheme in use.
 
 Also, it may be necessary to disambiguate if multiple interfaces across the `DBus`
-descriptions provide equally named signals.
+descriptions provide signals with the same name.
 
 Any of the arguments are optional.
 
 `#[validate(xml: <xml_path>, interface: <interface_name>, member: <member_name>)]`
+
+See also the [crates docs](https://docs.rs/zbus-lockstep-macros/latest) for more detailed descriptions of the arguments.
 
 ## LICENSE
 
