@@ -1214,6 +1214,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.29",
+ "tempfile",
  "version-sync",
  "zbus",
  "zbus-lockstep",
