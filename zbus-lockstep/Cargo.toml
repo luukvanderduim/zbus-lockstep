@@ -22,8 +22,9 @@ status = "actively-developed"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zbus = { version = "3", features = ["xml"] }
+zbus = { version = "3", default-features = false, features = ["xml"] }
 
 [dev-dependencies]
+zbus-lockstep = { path = "." }
 tempfile = "3.7"
 version-sync = "0.9"

@@ -1,13 +1,21 @@
 <node>
   <interface name="org.example.Node">
-
     <signal name="AddNode">
       <arg name="nodeAdded" type="(so)"/>
     </signal>
-
+    
     <signal name="RemoveNode">
       <arg name="nodeRemoved" type="(so)"/>
     </signal>
+
+    <method name="RequestName">
+      <arg direction="in" type="s"/>
+      <arg direction="in" type="u"/>
+      <arg direction="out" type="u"/>
+    </method>
+
+    <property name="Features" type="as" access="read">
+    </property>
 
   </interface>
 </node>
