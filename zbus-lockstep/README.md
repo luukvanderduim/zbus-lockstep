@@ -62,14 +62,29 @@ The test below shows how `zbus-lockstep` may be used given what we know about th
     use zbus_lockstep;
 
     #[test]
-    fn test_get_signature_of_cache_remove_accessible() {
-        let xml = PathBuf::from("xml/Node.xml");
+    fn test_get_signal_body_type_remove_node() {
+        let xml = PathBuf::from("../xml/test_definition_file.xml");
         let iface = "org.example.Node";
         let member = "RemoveNode";
 
         let signature = get_signal_body_type(xml, iface, member, None).unwrap();
-        assert_eq!(signature, Node::signature());
+        assert_eq!(signature, Signature::from_str_unchecked("(so)"));
     }
+```
+
+Alongside the functions, macros are provided which - if the path to the
+definitions is known - can retrieve signatures more succinctly.
+
+```rust
+#[test]
+fn macro_retrieve_signal_body_remove_node() {
+std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+use zbus_lockstep;
+
+let sig = signal_body_type_signature!("RemoveNode");
+assert_eq_signatures!(sig, zbus::zvariant::Signature::from_str_unchecked("(so)"));       
+}
+
 ```
 
 ## Note

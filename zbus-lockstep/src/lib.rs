@@ -1,18 +1,32 @@
 //! # zbus-lockstep
 //!
-//! `zbus-lockstep` is a library for retrieving `DBus` type signatures from XML descriptions
-//! and comparing those with the signature of your type signatures to ensure that they are
-//! compatible.
+//! Is a collection of helpers for retrieving `DBus` type signatures from XML descriptions.
+//! Useful for comparing these with your types' signatures to ensure that they are compatible.
 //!
-//! `zbus-lockstep`'s intended use is in tests, such that it will assure your types conform
-//! to XML definitions with `cargo test`.
+//! It offers functions that retrieve the signature of a method's argument type, of a method's
+//! return type, pf a signal's body type or of a property's type from `DBus` XML.  
+//!
+//! These functions require that you provide the file path to the XML file, the interface name,
+//! and the interface member wherein the signature resides.
+//!
+//! Corresponding to each of these functions, macros are provided which do not
+//! require you to exactly point out where the signature is found. These will just search
+//! by interface member name.
+//!
+//! The macros assume that the file path to the XML files is either:
+//!
+//! - `xml` or `XML`, the default path for `DBus` XML files - or is set by the
+//! - `LOCKSTEP_XML_PATH`, the env variable that overrides the default.
 #![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.1.1")]
 #![allow(clippy::missing_errors_doc)]
 
-mod marshall;
+mod macros;
+mod utils;
+
 use std::io::Read;
 
-pub use marshall::signatures_are_eq;
+pub use macros::resolve_xml_path;
+pub use utils::signatures_are_eq;
 use zbus::{
     xml::{Arg, Node},
     zvariant::Signature,
@@ -21,7 +35,14 @@ use zbus::{
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-/// Retrieves a signal's body type signature from `DBus` XML.
+#[derive(Debug, PartialEq, Eq)]
+pub enum MsgType {
+    Method,
+    Signal,
+    Property,
+}
+
+/// Retrieve a signal's body type signature from `DBus` XML.
 ///
 /// If you provide an argument name, then the signature of that argument is returned.
 /// If you do not provide an argument name, then the signature of all arguments is returned.    
@@ -29,14 +50,11 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 /// # Examples
 ///
 /// ```rust
-/// use std::fs::File;
-/// use std::io::{Seek, SeekFrom, Write};
-/// use tempfile::tempfile;
-/// use zbus::zvariant::{Signature, Type};
-/// use zbus::zvariant::OwnedObjectPath;
-/// use zbus_lockstep::get_signal_body_type;
-/// use zbus_lockstep::signatures_are_eq;
-/// use zbus_lockstep::assert_eq_signatures;
+/// # use std::fs::File;
+/// # use std::io::{Seek, SeekFrom, Write};
+/// # use tempfile::tempfile;
+/// use zbus::zvariant::{Signature, Type, OwnedObjectPath};
+/// use zbus_lockstep::{get_signal_body_type, signatures_are_eq, assert_eq_signatures};
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
 /// <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
@@ -62,7 +80,7 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 ///
 /// let signature = get_signal_body_type(xml_file, interface_name, member_name, None).unwrap();
 ///
-/// // Single `DBus` type codes, here 'o' are returned as a single character.
+/// // Single `DBus` type codes, here 'o', are returned as a single character.
 /// // Also, signal body types (often) omit the struct or tuple type parentheses.
 ///
 /// assert_ne!(signature, DeviceEvent::signature());
@@ -79,7 +97,7 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 ///
 /// # Notes
 ///
-/// See [`marshall::signatures_are_eq`] for more information about
+/// See [`signatures_are_eq`] for more information about
 /// comparing signatures.
 pub fn get_signal_body_type<'a>(
     mut xml: impl Read,
@@ -116,7 +134,7 @@ pub fn get_signal_body_type<'a>(
     Ok(Signature::from_string_unchecked(signature))
 }
 
-/// Gets the signature of a property's type from XML.
+/// Retrieve the signature of a property's type from XML.
 ///
 /// # Examples
 ///     
@@ -171,7 +189,7 @@ pub fn get_property_type<'a>(
     Ok(Signature::from_string_unchecked(signature))
 }
 
-/// Gets the signature of a method's return type from XML.
+/// Retrieve the signature of a method's return type from XML.
 ///
 /// If you provide an argument name, then the signature of that argument is returned.
 /// If you do not provide an argument name, then the signature of all arguments is returned.
@@ -253,7 +271,7 @@ pub fn get_method_return_type<'a>(
     Ok(Signature::from_string_unchecked(signature))
 }
 
-/// Gets the signature of a method's argument type from XML.
+/// Retrieve the signature of a method's argument type from XML.
 ///
 /// Useful when one or more arguments, used to call a method, outline a useful type.
 ///

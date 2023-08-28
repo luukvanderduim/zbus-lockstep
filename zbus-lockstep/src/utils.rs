@@ -19,7 +19,7 @@ use zbus::zvariant::Signature;
 ///
 /// assert!(signatures_are_eq(&sig1, &sig2));   
 /// ```
-///q
+///
 /// ```
 /// use zbus::zvariant::Signature;
 /// use zbus_lockstep::signatures_are_eq;
@@ -79,42 +79,6 @@ pub fn signatures_are_eq(lhs: &Signature, rhs: &Signature) -> bool {
     lhs_stripped == rhs_stripped
 }
 
-/// Asserts equality of signatures.
-///
-/// This macro allows both signatures to be a marshalling round apart.
-/// That is, they may differ by one pair of outer parentheses on either side.
-///
-/// If signatures differ due to marshalling, the difference between marshalled and
-/// unmarshalled signatures is one pair of outer parentheses. See [`signatures_are_eq`] for details.
-#[macro_export]
-macro_rules! assert_eq_signatures {
-    ($lhs_sig:expr, $rhs_sig:expr) => {
-        assert!(
-            signatures_are_eq($lhs_sig, $rhs_sig),
-            "Signatures are not equal (Lhs: {}, Rhs: {})",
-            $lhs_sig,
-            $rhs_sig
-        );
-    };
-}
-
-/// Asserts non-equality of signatures.
-///
-/// This macro is the inverse of [`assert_eq_signatures`].
-/// If signatures differ by more than one pair of outer parentheses -
-/// or are otherwise unequal, this macro will pass.
-#[macro_export]
-macro_rules! assert_ne_signatures {
-    ($lhs_sig:expr, $rhs_sig:expr) => {
-        assert!(
-            !signatures_are_eq($lhs_sig, $rhs_sig),
-            "Signatures are equal (Lhs: {}, Rhs: {})",
-            $lhs_sig,
-            $rhs_sig
-        );
-    };
-}
-
 #[cfg(test)]
 mod test {
     use zbus::zvariant::Signature;
@@ -152,64 +116,5 @@ mod test {
         let sig2 = Signature::from_str_unchecked("ii)(ii");
 
         assert!(!signatures_are_eq(&sig1, &sig2));
-    }
-
-    #[test]
-    fn test_assert_eq_signatures() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("a{sv}");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("(a{sv})");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_eq_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_assert_eq_signatures_panic() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("ii)(ii");
-
-        assert_eq_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    fn test_assert_ne_signatures() {
-        let sig1 = Signature::from_str_unchecked("(ii)");
-        let sig2 = Signature::from_str_unchecked("(uu)");
-
-        assert_ne_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("((a{sv}))");
-
-        assert_ne_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("(ii(ii))");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_ne_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_assert_ne_signatures_panic() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_ne_signatures!(&sig1, &sig2);
     }
 }

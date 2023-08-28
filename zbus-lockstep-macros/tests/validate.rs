@@ -7,7 +7,7 @@ use zbus_lockstep_macros::validate;
 #[test]
 fn test_validate_macro_node_add_path_as_env_variable() {
     // set env variable to enable validation
-    std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "./xml");
+    std::env::set_var("LOCKSTEP_XML_PATH", "./xml");
 
     #[validate]
     #[derive(Debug, Type)]
@@ -36,7 +36,7 @@ fn test_validate_macro_node_add_path_as_arg() {
 #[test]
 fn test_validate_macro_path_node_remove_as_env_variable() {
     // set env variable to enable validation
-    std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "./xml");
+    std::env::set_var("LOCKSTEP_XML_PATH", "./xml");
 
     #[validate]
     #[derive(Debug, Type)]
@@ -65,7 +65,7 @@ fn test_validate_macro_remove_node_path_as_arg() {
 #[test]
 fn test_validate_macro_path_node_remove_with_custom_name() {
     // set env variable to enable validation
-    std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "./xml");
+    std::env::set_var("LOCKSTEP_XML_PATH", "./xml");
 
     #[validate(signal: "RemoveNode")]
     #[derive(Debug, Type)]

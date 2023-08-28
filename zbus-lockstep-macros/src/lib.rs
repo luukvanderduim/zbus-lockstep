@@ -5,9 +5,6 @@
 
 type Result<T> = std::result::Result<T, syn::Error>;
 
-const DEFAULT_XML_PATH: &str = "xml";
-const DEFAULT_XML_PATH_ALT: &str = "XML";
-
 use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use proc_macro::TokenStream;
@@ -20,7 +17,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// struct's type signature.
 ///
 /// If the XML file(s) are found in the default location, `xml/` or `XML/` of the crate root,
-/// or provided as environment variable, `ZBUS_LOCKSTEP_XML_PATH`, the macro can be used without
+/// or provided as environment variable, `LOCKSTEP_XML_PATH`, the macro can be used without
 /// arguments.
 ///
 ///
@@ -55,7 +52,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 ///
 /// Alternatively, you can provide the XML directory path as environment variable,
-/// `ZBUS_LOCKSTEP_XML_PATH`, which will override both default and the path argument.
+/// `LOCKSTEP_XML_PATH`, which will override both default and the path argument.
 ///
 /// ## `interface`
 ///
@@ -64,7 +61,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// ```rust
 /// # // set env var to find XML file
-/// # std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
+/// # std::env::set_var("LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
 ///
@@ -83,7 +80,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// ```rust
 /// # // set env var to find XML file
-/// # std::env::set_var("ZBUS_LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
+/// # std::env::set_var("LOCKSTEP_XML_PATH", "zbus-lockstep-macros/tests/xml");
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
 ///
@@ -119,54 +116,20 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let item_struct = parse_macro_input!(input as ItemStruct);
     let item_name = item_struct.ident.to_string();
 
-    let mut xml = args.xml;
+    let xml_str = args.xml.as_ref().and_then(|p| p.to_str());
 
-    // If no XML path is provided, try to find the default XML path.
-    if xml.is_none() {
-        let mut path = std::env::current_dir().expect("Failed to get current directory");
-
-        path.push(DEFAULT_XML_PATH);
-        if path.exists() {
-            xml = Some(path.clone());
-        }
-
-        path.pop();
-
-        path.push(DEFAULT_XML_PATH_ALT);
-        if path.exists() {
-            xml = Some(path);
-        }
-    }
-
-    // Override the default, or argument path if the environment variable is set.
-    if let Ok(env_path_xml) = std::env::var("ZBUS_LOCKSTEP_XML_PATH") {
-        xml = Some(PathBuf::from(env_path_xml));
-    }
-
-    // If the path could not be resolved, emit a helpful compiler error.
-    if xml.is_none() {
-        let mut path = std::env::current_dir().unwrap();
-        path.push(DEFAULT_XML_PATH);
-        let path = path.to_str().unwrap();
-
-        let mut alt_path = std::env::current_dir().unwrap();
-        alt_path.push(DEFAULT_XML_PATH_ALT);
-        let alt_path = alt_path.to_str().unwrap();
-
-        let error_message = format!(
-            "No XML file provided and no default XML file found in \"{}\" or \"{}\"",
-            path, alt_path
-        );
-
-        return syn::Error::new(proc_macro2::Span::call_site(), error_message)
+    // It seems hard to return a compiler error from unwrap_or_else, so we u
+    let xml = match zbus_lockstep::resolve_xml_path(xml_str) {
+        Ok(xml) => xml,
+        Err(e) => {
+            return syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!("Failed to resolve XML path: {e}"),
+            )
             .to_compile_error()
             .into();
-    }
-
-    // Unwrap the XML path and canonicalize it.
-    // Reason: The current working directory might differ between the macro call and the test.
-    let xml = xml.expect("XML path should be resolved by now.");
-    let xml = std::fs::canonicalize(xml).expect("Failed to canonicalize XML path");
+        }
+    };
 
     // Store each file's XML as a string in a with the XML's file path as key.
     let mut xml_files: HashMap<PathBuf, String> = HashMap::new();
@@ -177,7 +140,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     if let Err(e) = read_dir {
         return syn::Error::new(
             proc_macro2::Span::call_site(),
-            format!("Failed to read XML directory: {}", e),
+            format!("Failed to read XML directory: {e}"),
         )
         .to_compile_error()
         .into();
@@ -289,7 +252,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
         .expect("XML file path should be valid UTF-8");
 
     // Create a block to return the item struct with a uniquely named validation test.
-    let test_name = format!("test_{}_type_signature", item_name);
+    let test_name = format!("test_{item_name}_type_signature");
     let test_name = Ident::new(&test_name, proc_macro2::Span::call_site());
 
     let item_struct_name = item_struct.ident.clone();
@@ -362,7 +325,7 @@ impl syn::parse::Parse for ValidateArgs {
                 _ => {
                     return Err(syn::Error::new(
                         ident.span(),
-                        format!("Unexpected argument: {}", ident),
+                        format!("Unexpected argument: {ident}"),
                     ))
                 }
             }
