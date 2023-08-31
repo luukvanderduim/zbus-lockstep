@@ -38,7 +38,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// Use the `xml` argument:
 ///
-/// ```
+/// ```no_run
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
 ///
@@ -59,8 +59,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// If more than one signal with the same name is defined in the XML file(s),
 /// the macro will fail and you can provide an interface name to disambiguate.
 ///
-/// ```
-/// # // set env var to find XML file
+/// ```no_run
 /// # std::env::set_var("LOCKSTEP_XML_PATH", "xml");
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
@@ -78,8 +77,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// If a custom signal name is desired, you can be provided using `signal:`.
 ///
-/// ```
-/// # // set env var to find XML file
+/// ```no_run
 /// # std::env::set_var("LOCKSTEP_XML_PATH", "xml");
 /// # use zbus_lockstep_macros::validate;
 /// # use zbus::zvariant::{OwnedObjectPath, Type};
@@ -95,7 +93,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// # Examples
 ///
-/// ```
+/// ```no_run
 /// use zbus_lockstep_macros::validate;
 /// use zbus::zvariant::{OwnedObjectPath, Type};
 ///
@@ -117,7 +115,6 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
     let xml_str = args.xml.as_ref().and_then(|p| p.to_str());
 
-    // It seems hard to return a compiler error from unwrap_or_else, so we u
     let xml = match zbus_lockstep::resolve_xml_path(xml_str) {
         Ok(xml) => xml,
         Err(e) => {

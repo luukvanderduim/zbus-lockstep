@@ -22,9 +22,8 @@ proc-macro = true
 syn = "2.0"
 proc-macro2 = "1.0"
 quote = "1.0"
-zbus-lockstep = { path = "../zbus-lockstep", version = "0.1.0" }
+zbus-lockstep = { path = "../zbus-lockstep" }
 zbus = { version = "3", features = ["xml"] }
 
 [dev-dependencies]
 version-sync = "0.9"
-tempfile = "3.8"
