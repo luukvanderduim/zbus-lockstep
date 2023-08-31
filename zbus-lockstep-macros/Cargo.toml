@@ -2,7 +2,7 @@
 name = "zbus-lockstep-macros"
 authors = ["Luuk van der Duim <luukvanderduim@gmail.com>"]
 description = "Macros to keep types in lockstep with DBus XML definitions"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 categories = ["API-bindings"]
@@ -11,7 +11,7 @@ repository = "https://github.com/luukvanderduim/zbus-lockstep//zbus-lockstep-mac
 readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "LICENSE-MIT", "README.md"]
-publish = false
+publish = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
