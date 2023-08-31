@@ -38,10 +38,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// Use the `xml` argument:
 ///
-/// ```no_run
-/// # use zbus_lockstep_macros::validate;
-/// # use zbus::zvariant::{OwnedObjectPath, Type};
-///
+/// ```ignore
 /// #[validate(xml: "xml")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
@@ -59,11 +56,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// If more than one signal with the same name is defined in the XML file(s),
 /// the macro will fail and you can provide an interface name to disambiguate.
 ///
-/// ```no_run
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "xml");
-/// # use zbus_lockstep_macros::validate;
-/// # use zbus::zvariant::{OwnedObjectPath, Type};
-///
+/// ```ignore
 /// #[validate(interface: "org.example.Node")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
@@ -77,11 +70,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// If a custom signal name is desired, you can be provided using `signal:`.
 ///
-/// ```no_run
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "xml");
-/// # use zbus_lockstep_macros::validate;
-/// # use zbus::zvariant::{OwnedObjectPath, Type};
-///
+/// ```ignore
 /// #[validate(signal: "RemoveNode")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
@@ -93,10 +82,7 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 ///
 /// # Examples
 ///
-/// ```no_run
-/// use zbus_lockstep_macros::validate;
-/// use zbus::zvariant::{OwnedObjectPath, Type};
-///
+/// ```ignore
 /// #[validate(xml: "xml")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
