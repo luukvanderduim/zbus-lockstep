@@ -425,7 +425,8 @@ macro_rules! property_type_signature {
 mod test {
     use zbus::zvariant::Signature;
 
-    use crate::utils::signatures_are_eq;
+    use crate as zbus_lockstep;
+    use crate::{signal_body_type_signature, utils::signatures_are_eq};
 
     #[test]
     fn test_assert_eq_signatures() {

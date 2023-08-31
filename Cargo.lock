@@ -1203,7 +1203,6 @@ dependencies = [
  "tempfile",
  "version-sync",
  "zbus",
- "zbus-lockstep",
 ]
 
 [[package]]
