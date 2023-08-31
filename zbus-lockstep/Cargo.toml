@@ -25,6 +25,6 @@ status = "actively-developed"
 zbus = { version = "3", default-features = false, features = ["xml"] }
 
 [dev-dependencies]
-zbus-lockstep = { path = "." }
+zbus-lockstep = { path = ".", version = "0.2.0" }
 tempfile = "3.7"
 version-sync = "0.9"
