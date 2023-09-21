@@ -262,7 +262,7 @@ macro_rules! method_return_signature {
         let interface = Some($interface);
 
         // Looking for default path or path specified by environment variable.
-        let xml_path = resolve_xml_path!(None);
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -311,7 +311,7 @@ macro_rules! method_args_signature {
         let interface = Some($interface);
 
         // Looking for default path or path specified by environment variable.
-        let xml_path = resolve_xml_path!(None);
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -358,7 +358,7 @@ macro_rules! signal_body_type_signature {
         let interface = Some($interface);
 
         // Looking for default path or path specified by environment variable.
-        let xml_path = resolve_xml_path!(None);
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -405,7 +405,7 @@ macro_rules! property_type_signature {
         let interface = Some($interface);
 
         // Looking for default path or path specified by environment variable.
-        let xml_path = zbus_lockstep::resolve_xml_path!(None);
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
