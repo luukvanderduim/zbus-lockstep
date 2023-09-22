@@ -77,7 +77,7 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     Ok(xml.canonicalize()?)
 }
 
-/// A generic helper to find the file path and interface name of a member
+/// A generic helper to find the file path and interface name of a member.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! find_definition_in_dbus_xml {
@@ -250,7 +250,7 @@ macro_rules! method_return_signature {
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
+            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
         zbus_lockstep::get_method_return_type(file, &interface_name, member, None)
@@ -265,8 +265,12 @@ macro_rules! method_return_signature {
         let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
+        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
+            xml_path,
+            member,
+            interface,
+            MsgType::Method
+        );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
         zbus_lockstep::get_method_return_type(file, &interface_name, member, None)
@@ -299,7 +303,7 @@ macro_rules! method_args_signature {
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
+            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
         zbus_lockstep::get_method_args_type(file, &interface_name, member, None)
@@ -314,8 +318,12 @@ macro_rules! method_args_signature {
         let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
+        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
+            xml_path,
+            member,
+            interface,
+            MsgType::Method
+        );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
         zbus_lockstep::get_method_args_type(file, interface_name, member, None)
@@ -345,7 +353,7 @@ macro_rules! signal_body_type_signature {
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Signal);
+            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Signal);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
 
@@ -361,8 +369,12 @@ macro_rules! signal_body_type_signature {
         let xml_path = zbus_lockstep::resolve_xml_path(None).expect("Failed to resolve XML path");
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Signal);
+        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
+            xml_path,
+            member,
+            interface,
+            MsgType::Signal
+        );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
         zbus_lockstep::get_signal_body_type(file, interface_name, member, None)
@@ -392,7 +404,7 @@ macro_rules! property_type_signature {
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Property);
+            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Property);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
 
