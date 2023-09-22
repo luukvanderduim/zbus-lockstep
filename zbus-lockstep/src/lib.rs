@@ -17,7 +17,7 @@
 //!
 //! - `xml` or `XML`, the default path for `DBus` XML files - or is set by the
 //! - `LOCKSTEP_XML_PATH`, the env variable that overrides the default.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.2.0")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.2.1")]
 #![allow(clippy::missing_errors_doc)]
 
 mod macros;
