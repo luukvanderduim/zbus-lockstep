@@ -2,7 +2,7 @@
 name = "zbus-lockstep-macros"
 authors = ["Luuk van der Duim <luukvanderduim@gmail.com>"]
 description = "Macros to keep types in lockstep with DBus XML definitions"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 categories = ["API-bindings"]
@@ -22,7 +22,7 @@ proc-macro = true
 syn = "2.0"
 proc-macro2 = "1.0"
 quote = "1.0"
-zbus-lockstep = { path = "../zbus-lockstep", version = "0.2.1" }
+zbus-lockstep = { path = "../zbus-lockstep", version = "0.2.2" }
 zbus = { version = "3", features = ["xml"] }
 
 [dev-dependencies]

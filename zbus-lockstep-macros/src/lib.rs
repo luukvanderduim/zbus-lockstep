@@ -1,7 +1,7 @@
 //! # zbus-lockstep-macros
 //!
 //! This provides the `validate` macro that builds on `zbus-lockstep`.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep-macros/0.2.1")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep-macros/0.2.2")]
 
 type Result<T> = std::result::Result<T, syn::Error>;
 
