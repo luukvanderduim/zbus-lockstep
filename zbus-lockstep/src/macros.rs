@@ -184,7 +184,7 @@ macro_rules! find_definition_in_dbus_xml {
 macro_rules! assert_eq_signatures {
     ($lhs_sig:expr, $rhs_sig:expr) => {
         assert!(
-            signatures_are_eq($lhs_sig, $rhs_sig),
+            zbus_lockstep::signatures_are_eq($lhs_sig, $rhs_sig),
             "Signatures are not equal (Lhs: {}, Rhs: {})",
             $lhs_sig,
             $rhs_sig
@@ -201,7 +201,7 @@ macro_rules! assert_eq_signatures {
 macro_rules! assert_ne_signatures {
     ($lhs_sig:expr, $rhs_sig:expr) => {
         assert!(
-            !signatures_are_eq($lhs_sig, $rhs_sig),
+            !zbus_lockstep::signatures_are_eq($lhs_sig, $rhs_sig),
             "Signatures are equal (Lhs: {}, Rhs: {})",
             $lhs_sig,
             $rhs_sig
