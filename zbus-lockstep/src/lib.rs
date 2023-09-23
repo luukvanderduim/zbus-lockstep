@@ -289,7 +289,6 @@ pub fn get_method_return_type<'a>(
 /// use zbus::zvariant::{Type, Value};
 /// use zbus_lockstep::get_method_args_type;
 /// use zbus_lockstep::assert_eq_signatures;
-/// use zbus_lockstep::signatures_are_eq;
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
 /// <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
