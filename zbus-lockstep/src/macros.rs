@@ -456,7 +456,7 @@ macro_rules! property_type_signature {
             xml_path,
             member,
             interface,
-            MsgType::Property,
+            MsgType::Property
         );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
@@ -541,11 +541,29 @@ mod test {
     }
 
     #[test]
+    fn test_signal_body_signature_macro_with_interface() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::signal_body_type_signature!("AddNode", "org.example.Node");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+    }
+
+    #[test]
     fn test_method_args_signature_macro() {
         // path to XML files
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
+    }
+
+    #[test]
+    fn test_method_args_signature_macro_with_interface() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node");
         assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
     }
 
@@ -559,11 +577,29 @@ mod test {
     }
 
     #[test]
+    fn test_method_return_signature_macro_with_interface() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::method_return_signature!("RequestName", "org.example.Node");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+    }
+
+    #[test]
     fn test_property_type_signature_macro() {
         // path to XML files
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!("Features");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
+    }
+
+    #[test]
+    fn test_property_type_signature_macro_with_interface() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::property_type_signature!("Features", "org.example.Node");
         assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
     }
 }
