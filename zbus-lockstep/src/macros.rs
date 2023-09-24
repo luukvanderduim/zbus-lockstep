@@ -263,7 +263,7 @@ macro_rules! method_return_signature {
 
     ($member:expr, $interface:expr) => {{
         let member = $member;
-        let interface = Some($interface);
+        let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
@@ -324,7 +324,7 @@ macro_rules! method_args_signature {
 
     ($member:expr, $interface:expr) => {{
         let member = $member;
-        let interface = Some($interface);
+        let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
@@ -383,7 +383,7 @@ macro_rules! signal_body_type_signature {
 
     ($member:expr, $interface:expr) => {{
         let member = $member;
-        let interface = Some($interface);
+        let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
@@ -442,7 +442,7 @@ macro_rules! property_type_signature {
 
     ($member:expr, $interface:expr) => {{
         let member = $member;
-        let interface = Some($interface);
+        let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
