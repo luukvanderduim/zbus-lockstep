@@ -342,7 +342,7 @@ macro_rules! method_args_signature {
         );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_args_type(file, interface_name, member, None)
+        zbus_lockstep::get_method_args_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 }
@@ -401,7 +401,7 @@ macro_rules! signal_body_type_signature {
         );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_signal_body_type(file, interface_name, member, None)
+        zbus_lockstep::get_signal_body_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 }
@@ -460,7 +460,7 @@ macro_rules! property_type_signature {
         );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_property_type(file, interface_name, member, None)
+        zbus_lockstep::get_property_type(file, &interface_name, member, None)
             .expect("Failed to get property type signature")
     }};
 }
