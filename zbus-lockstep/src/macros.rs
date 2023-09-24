@@ -460,7 +460,7 @@ macro_rules! property_type_signature {
         );
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_property_type(file, &interface_name, member, None)
+        zbus_lockstep::get_property_type(file, &interface_name, member)
             .expect("Failed to get property type signature")
     }};
 }
