@@ -1215,7 +1215,7 @@ dependencies = [
 
 [[package]]
 name = "zbus-lockstep"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "tempfile",
  "version-sync",
@@ -1224,7 +1224,7 @@ dependencies = [
 
 [[package]]
 name = "zbus-lockstep-macros"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "proc-macro2",
  "quote",
