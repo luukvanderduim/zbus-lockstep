@@ -418,6 +418,25 @@ macro_rules! signal_body_type_signature {
 /// specify the interface name as well.
 ///
 /// This macro can be called with or without the interface name.
+///
+/// # Examples
+///
+/// ```rust
+/// use zbus_lockstep::{property_type_signature, assert_eq_signatures};
+/// use zbus::zvariant::Signature;
+///
+/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+///     
+/// let sig = property_type_signature!("Features");
+/// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("as"));
+/// ```
+/// The member name and/or interface name can be used tp identify the arguments:
+///
+/// ```rust
+/// # use zbus_lockstep::{property_type_signature};
+/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+/// let _sig = property_type_signature!(member: "Features", interface: "org.example.Node");
+/// ```
 #[macro_export]
 macro_rules! property_type_signature {
     ($member:expr) => {{
