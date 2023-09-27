@@ -223,23 +223,27 @@ macro_rules! assert_ne_signatures {
 /// If multiple interfaces offer the same method, you will need to specify the
 /// interface name as well.
 ///
-/// # Example
+/// This macro can be called with or without the interface name.
 ///
+/// # Examples
+/// 
 /// ```rust
-/// # use zbus_lockstep::find_definition_in_dbus_xml;
-/// # use zbus_lockstep::MsgType;
-/// # use zbus_lockstep::resolve_xml_path;
-/// # use zbus_lockstep::{method_return_signature, signatures_are_eq};
-/// # use zbus::zvariant::Signature;
-/// # use zbus_lockstep::assert_eq_signatures;
-/// # fn main() {
-/// // path to XML files
+/// use zbus_lockstep::{method_return_signature, assert_eq_signatures};
+/// use zbus::zvariant::Signature;
+///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("u"));
 /// # }
 /// ```
+/// The member name and/or interface name can be used tp identify the arguments:
+///
+/// ```rust
+/// # use zbus_lockstep::{method_return_signature};
+/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+/// let _sig = method_return_signature!(member: "RequestName", interface: "org.example.Node");
+/// ````
 #[macro_export]
 macro_rules! method_return_signature {
     ($member:expr) => {{
