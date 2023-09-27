@@ -115,7 +115,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
     // Store each file's XML as a string in a with the XML's file path as key.
     let mut xml_files: HashMap<PathBuf, String> = HashMap::new();
-    let read_dir = std::fs::read_dir(&xml);
+    let read_dir = std::fs::read_dir(xml);
 
     // If the path does not exist, the process lacks permissions to read the path,
     // or the path is not a directory, return an error.
