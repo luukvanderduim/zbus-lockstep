@@ -440,6 +440,10 @@ macro_rules! property_type_signature {
             .expect("Failed to get property type signature")
     }};
 
+    (member: $member:expr) => {
+        property_type_signature!($member)
+    };
+
     ($member:expr, $interface:expr) => {{
         let member = $member;
         let interface = Some($interface.to_string());
@@ -463,6 +467,10 @@ macro_rules! property_type_signature {
         zbus_lockstep::get_property_type(file, &interface_name, member)
             .expect("Failed to get property type signature")
     }};
+
+    (member: $member:expr, interface: $interface:expr) => {
+        property_type_signature!($member, $interface)
+    };
 }
 
 #[cfg(test)]
