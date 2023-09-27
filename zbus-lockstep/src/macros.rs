@@ -261,6 +261,10 @@ macro_rules! method_return_signature {
             .expect("Failed to get method arguments type signature")
     }};
 
+    (member: $member:expr) => {
+        method_return_signature!($member)
+    };
+
     ($member:expr, $interface:expr) => {{
         let member = $member;
         let interface = Some($interface.to_string());
@@ -284,6 +288,10 @@ macro_rules! method_return_signature {
         zbus_lockstep::get_method_return_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
+
+    (member: $member:expr, interface: $interface:expr) => {
+        method_return_signature!($member, $interface)
+    };
 }
 
 /// Retrieve the signature of a method's arguments.
