@@ -226,7 +226,7 @@ macro_rules! assert_ne_signatures {
 /// This macro can be called with or without the interface name.
 ///
 /// # Examples
-/// 
+///
 /// ```rust
 /// use zbus_lockstep::{method_return_signature, assert_eq_signatures};
 /// use zbus::zvariant::Signature;
@@ -235,7 +235,6 @@ macro_rules! assert_ne_signatures {
 ///     
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("u"));
-/// # }
 /// ```
 /// The member name and/or interface name can be used tp identify the arguments:
 ///
