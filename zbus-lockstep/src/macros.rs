@@ -381,6 +381,10 @@ macro_rules! signal_body_type_signature {
             .expect("Failed to get method arguments type signature")
     }};
 
+    (member: $member:expr) => {
+        signal_body_type_signature!($member)
+    };
+
     ($member:expr, $interface:expr) => {{
         let member = $member;
         let interface = Some($interface.to_string());
@@ -404,6 +408,10 @@ macro_rules! signal_body_type_signature {
         zbus_lockstep::get_signal_body_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
+
+    (member: $member:expr, interface: $interface:expr) => {
+        signal_body_type_signature!($member, $interface)
+    };
 }
 
 /// Retrieve the signature of a property's type.
