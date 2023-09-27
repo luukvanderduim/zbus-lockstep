@@ -576,11 +576,29 @@ mod test {
     }
 
     #[test]
+    fn test_signal_body_signature_macro_with_identifier() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+    }
+
+    #[test]
     fn test_signal_body_signature_macro_with_interface() {
         // path to XML files
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("AddNode", "org.example.Node");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+    }
+
+    #[test]
+    fn test_signal_body_signature_macro_with_interface_and_identifiers() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
         assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
     }
 
