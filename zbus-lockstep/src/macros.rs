@@ -702,11 +702,29 @@ mod test {
     }
 
     #[test]
+    fn test_method_return_signature_macro_with_identifier() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::method_return_signature!(member: "RequestName");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+    }
+
+    #[test]
     fn test_method_return_signature_macro_with_interface() {
         // path to XML files
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!("RequestName", "org.example.Node");
+        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+    }
+
+    #[test]
+    fn test_method_return_signature_macro_with_interface_and_identifiers() {
+        // path to XML files
+        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+
+        let sig = zbus_lockstep::method_return_signature!(member: "RequestName", interface: "org.example.Node");
         assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
     }
 
