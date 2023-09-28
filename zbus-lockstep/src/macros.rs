@@ -437,6 +437,60 @@ macro_rules! method_args_signature {
     (member: $member:expr, interface: $interface:expr) => {
         method_args_signature!($member, $interface)
     };
+
+    ($member:expr, $interface:expr, $argument:expr) => {{
+        let member = $member;
+        let interface = Some($interface.to_string());
+
+        let argument = Some($argument);
+
+        // Looking for default path or path specified by environment variable.
+        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
+
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+            "Failed to resolve XML path, current dir: {}",
+            current_dir.to_str().unwrap()
+        ));
+        // Find the definition of the method in the XML specification.
+        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
+            xml_path,
+            member,
+            interface,
+            MsgType::Method
+        );
+
+        let file = std::fs::File::open(file_path).expect("Failed to open file");
+        zbus_lockstep::get_method_args_type(file, &interface_name, member, argument)
+            .expect("Failed to get method argument(s) type signature")
+    }};
+
+    (member: $member:expr, interface: $interface:expr, argument: $argument:expr) => {
+        method_args_signature!($member, $interface, $argument)
+    };
+
+    ($member:expr, $argument:expr) => {{
+        let member = $member;
+        let argument = Some($argument);
+
+        // Looking for default path or path specified by environment variable.
+        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
+
+        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+            "Failed to resolve XML path, current dir: {}",
+            current_dir.to_str().unwrap()
+        ));
+        // Find the definition of the method in the XML specification.
+        let (file_path, interface_name) =
+            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
+
+        let file = std::fs::File::open(file_path).expect("Failed to open file");
+        zbus_lockstep::get_method_args_type(file, &interface_name, member, argument)
+            .expect("Failed to get method arguments type signature")
+    }};
+
+    (member: $member:expr, argument: $argument:expr) => {
+        method_args_signature!($member, $argument)
+    };
 }
 
 /// Retrieve the signature of a signal's body type.
