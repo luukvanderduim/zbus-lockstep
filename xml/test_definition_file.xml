@@ -3,7 +3,7 @@
     <signal name="AddNode">
       <arg name="nodeAdded" type="(so)"/>
     </signal>
-    
+
     <signal name="Alert">
       <arg name="urgent" type="b"/>
       <arg name="color" type="s"/>
