@@ -227,6 +227,8 @@ macro_rules! assert_ne_signatures {
 ///
 /// # Examples
 ///
+/// Basic usage:
+///
 /// ```rust
 /// use zbus_lockstep::{method_return_signature, assert_eq_signatures};
 /// use zbus::zvariant::Signature;
@@ -236,13 +238,18 @@ macro_rules! assert_ne_signatures {
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("u"));
 /// ```
-/// The member name and/or interface name can be used tp identify the arguments:
+/// The macro supports colling arguments with identifiers as well as without.
+/// The macro may also be called with an interface name or interface and argument name:
 ///
 /// ```rust
 /// # use zbus_lockstep::{method_return_signature};
 /// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-/// let _sig = method_return_signature!(member: "RequestName", interface: "org.example.Node");
-/// ````
+/// let _sig = method_return_signature!("RequestName", "org.example.Node", "grape");
+///
+/// // or alternatively
+///
+/// let _sig = method_return_signature!(member: "RequestName", interface: "org.example.Node", argument: "grape");
+/// ```
 #[macro_export]
 macro_rules! method_return_signature {
     ($member:expr) => {{
@@ -354,12 +361,17 @@ macro_rules! method_return_signature {
 /// let sig = method_args_signature!("RequestName");
 /// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("(su)"));
 /// ```
-/// The member name and/or interface name can be used tp identify the arguments:
+/// The macro supports colling arguments with identifiers as well as without.
+/// The macro may also be called with an interface name or interface and argument name:
 ///
 /// ```rust
 /// # use zbus_lockstep::{method_args_signature};
 /// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-/// let _sig = method_args_signature!(member: "RequestName", interface: "org.example.Node");
+/// let _sig = method_args_signature!("RequestName", "org.example.Node", "apple");
+///
+/// // or alternatively
+///     
+/// let _sig = method_args_signature!(member: "RequestName", interface: "org.example.Node", argument: "apple");
 /// ```
 #[macro_export]
 macro_rules! method_args_signature {
@@ -469,12 +481,17 @@ macro_rules! method_args_signature {
 /// let sig = signal_body_type_signature!("AddNode");
 /// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("(so)"));
 /// ```
-/// The member name and/or interface name can be used tp identify the arguments:
+/// The macro supports colling arguments with identifiers as well as without.
+/// The macro may also be called with an interface name or interface and argument name:
 ///
 /// ```rust
 /// # use zbus_lockstep::{signal_body_type_signature};
 /// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-/// let _sig = signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
+/// let _sig = signal_body_type_signature!("Alert", "org.example.Node", "color");
+///
+/// // or alternatively
+///
+/// let _sig = signal_body_type_signature!(member: "Alert", interface: "org.example.Node", argument: "color");
 /// ```
 #[macro_export]
 macro_rules! signal_body_type_signature {
