@@ -69,7 +69,10 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
 
     // If no XML path is provided and the default XML path is not found, panic.
     if xml.is_none() {
-        panic!("No XML path provided and default XML path not found.");
+        panic!(
+            "No XML path provided and default XML path not found. Current dir: \"{}\" ",
+            current_dir.to_str().expect("current_dir is valid UTF-8")
+        );
     }
 
     // Convert, canonicalize and return the XML path.
