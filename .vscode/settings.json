@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "canonicalized"
-    ]
+    ],
+    "rust-analyzer.cargo.noDefaultFeatures": true
 }

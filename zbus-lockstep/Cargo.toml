@@ -5,7 +5,7 @@ authors = [
     "Tait Hoyem<tait@tait.tech>",
 ]
 description = "Keep types in lockstep with DBus XML definitions"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 categories = ["API-bindings"]
@@ -22,8 +22,9 @@ status = "actively-developed"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zbus = { version = "3", features = ["xml"] }
+zbus_xml = { version = "4.0" }
+zvariant = { version = "4.0" }
 
 [dev-dependencies]
-tempfile = "3.7"
+tempfile = "3"
 version-sync = "0.9"

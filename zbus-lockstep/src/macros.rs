@@ -4,8 +4,6 @@
 
 use std::{fs, path::PathBuf, str::FromStr};
 
-use zbus::xml;
-
 use crate::Result;
 
 /// Resolve XML path from either:
@@ -107,12 +105,12 @@ macro_rules! find_definition_in_dbus_xml {
         }
 
         let entry_path = entry.path().clone();
-        let xml_string = std::fs::read_to_string(entry.path()).expect("Failed to read XML file");
-        let node = <zbus::xml::Node as std::str::FromStr>::from_str(&xml_string).expect("Failed to parse XML file");
+        let file = std::fs::File::open(entry.path()).expect("Failed to open file");
+        let node = zbus_xml::Node::from_reader(file).expect("Failed to parse XML file");
 
         for interface in node.interfaces() {
             // If called with an `iface` arg, skip he interfaces that do not match.
-            if iface.is_some() && interface.name() != iface.clone().unwrap()  {
+            if iface.is_some() && interface.name().as_str() != iface.clone().unwrap()  {
                 continue;
             }
 
@@ -175,43 +173,6 @@ macro_rules! find_definition_in_dbus_xml {
     }};
 }
 
-/// Asserts equality of signatures.
-///
-/// This macro allows both signatures to be a marshalling round apart.
-/// That is, they may differ by one pair of outer parentheses on either side.
-///
-/// If signatures differ due to marshalling, the difference between marshalled and
-/// unmarshalled signatures is one pair of outer parentheses. See
-/// [`crate::signatures_are_eq`] for details.
-#[macro_export]
-macro_rules! assert_eq_signatures {
-    ($lhs_sig:expr, $rhs_sig:expr) => {
-        assert!(
-            zbus_lockstep::signatures_are_eq($lhs_sig, $rhs_sig),
-            "Signatures are not equal (Lhs: {}, Rhs: {})",
-            $lhs_sig,
-            $rhs_sig
-        );
-    };
-}
-
-/// Asserts non-equality of signatures.
-///
-/// This macro is the inverse of [`assert_eq_signatures`].
-/// If signatures differ by more than one pair of outer parentheses -
-/// or are otherwise unequal, this macro will pass.
-#[macro_export]
-macro_rules! assert_ne_signatures {
-    ($lhs_sig:expr, $rhs_sig:expr) => {
-        assert!(
-            !zbus_lockstep::signatures_are_eq($lhs_sig, $rhs_sig),
-            "Signatures are equal (Lhs: {}, Rhs: {})",
-            $lhs_sig,
-            $rhs_sig
-        );
-    };
-}
-
 /// Retrieve the signature of a method's return type.
 ///
 /// This macro will take a method member name and return the signature of the
@@ -233,13 +194,13 @@ macro_rules! assert_ne_signatures {
 /// Basic usage:
 ///
 /// ```rust
-/// use zbus_lockstep::{method_return_signature, assert_eq_signatures};
-/// use zbus::zvariant::Signature;
+/// use zbus_lockstep::method_return_signature;
+/// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = method_return_signature!("RequestName");
-/// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("u"));
+/// assert_eq!(&sig, &Signature::from_str_unchecked("u"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -356,13 +317,13 @@ macro_rules! method_return_signature {
 /// # Examples
 ///
 /// ```rust
-/// use zbus_lockstep::{method_args_signature, assert_eq_signatures};
-/// use zbus::zvariant::Signature;
+/// use zbus_lockstep::method_args_signature;
+/// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = method_args_signature!("RequestName");
-/// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("(su)"));
+/// assert_eq!(&sig, &Signature::from_str_unchecked("(su)"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -476,13 +437,13 @@ macro_rules! method_args_signature {
 /// # Examples
 ///
 /// ```rust
-/// use zbus_lockstep::{signal_body_type_signature, assert_eq_signatures};
-/// use zbus::zvariant::Signature;
+/// use zbus_lockstep::signal_body_type_signature;
+/// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = signal_body_type_signature!("AddNode");
-/// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("(so)"));
+/// assert_eq!(&sig, &Signature::from_str_unchecked("(so)"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -597,13 +558,13 @@ macro_rules! signal_body_type_signature {
 /// # Examples
 ///
 /// ```rust
-/// use zbus_lockstep::{property_type_signature, assert_eq_signatures};
-/// use zbus::zvariant::Signature;
+/// use zbus_lockstep::property_type_signature;
+/// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = property_type_signature!("Features");
-/// assert_eq_signatures!(&sig, &Signature::from_str_unchecked("as"));
+/// assert_eq!(&sig, &Signature::from_str_unchecked("as"));
 /// ```
 /// The member name and/or interface name can be used tp identify the arguments:
 ///
@@ -669,69 +630,10 @@ macro_rules! property_type_signature {
 
 #[cfg(test)]
 mod test {
-    use zbus::zvariant::Signature;
+    use zvariant::Signature;
 
     use crate as zbus_lockstep;
-    use crate::{signal_body_type_signature, utils::signatures_are_eq};
-
-    #[test]
-    fn test_assert_eq_signatures() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("a{sv}");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("(a{sv})");
-
-        assert_eq_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_eq_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_assert_eq_signatures_panic() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("ii)(ii");
-
-        assert_eq_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    fn test_assert_ne_signatures() {
-        let sig1 = Signature::from_str_unchecked("(ii)");
-        let sig2 = Signature::from_str_unchecked("(uu)");
-
-        assert_ne_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("a{sv}");
-        let sig2 = Signature::from_str_unchecked("((a{sv}))");
-
-        assert_ne_signatures!(&sig1, &sig2);
-
-        let sig1 = Signature::from_str_unchecked("(ii(ii))");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_ne_signatures!(&sig1, &sig2);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_assert_ne_signatures_panic() {
-        let sig1 = Signature::from_str_unchecked("(ii)(ii)");
-        let sig2 = Signature::from_str_unchecked("((ii)(ii))");
-
-        assert_ne_signatures!(&sig1, &sig2);
-    }
+    use crate::signal_body_type_signature;
 
     #[test]
     fn test_signal_body_signature_macro() {
@@ -739,7 +641,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("AddNode");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -748,7 +650,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -757,7 +659,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("AddNode", "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -766,7 +668,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -775,7 +677,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("Alert", "org.example.Node", "volume");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("d"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("d"));
     }
 
     #[test]
@@ -788,7 +690,7 @@ mod test {
             interface: "org.example.Node",
             argument: "urgent"
         );
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("b"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("b"));
     }
 
     #[test]
@@ -797,7 +699,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -806,7 +708,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!(member: "RequestName");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -815,7 +717,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -824,7 +726,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -833,7 +735,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node", "apple");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("s"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("s"));
     }
 
     #[test]
@@ -846,7 +748,7 @@ mod test {
             interface: "org.example.Node",
             argument: "orange"
         );
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -855,7 +757,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!("RequestName");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -864,7 +766,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!(member: "RequestName");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -873,7 +775,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!("RequestName", "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -882,7 +784,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -892,7 +794,7 @@ mod test {
 
         let sig =
             zbus_lockstep::method_return_signature!("RequestName", "org.example.Node", "grape");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -905,7 +807,7 @@ mod test {
             interface: "org.example.Node",
             argument: "grape"
         );
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -914,7 +816,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!("Features");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -923,7 +825,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!(member: "Features");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -932,7 +834,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!("Features", "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -941,6 +843,6 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!(member: "Features", interface: "org.example.Node");
-        assert_eq_signatures!(&sig, &zbus::zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
     }
 }

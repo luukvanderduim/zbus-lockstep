@@ -26,7 +26,7 @@ Add `zbus-lockstep` to `Cargo.toml`'s dev-dependencies:
 
 ```toml
 [dev-dependencies]
-zbus-lockstep = "0.3.1"
+zbus-lockstep = "0.4"
 ```
 
 Consider the followwing XML description, an interface with a single signal.
@@ -82,7 +82,7 @@ std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 use zbus_lockstep;
 
 let sig = signal_body_type_signature!("RemoveNode");
-assert_eq_signatures!(sig, zbus::zvariant::Signature::from_str_unchecked("(so)"));       
+assert_eq!(sig, zvariant::Signature::from_str_unchecked("(so)"));       
 }
 
 ```

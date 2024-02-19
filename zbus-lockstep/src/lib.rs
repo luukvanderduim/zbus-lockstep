@@ -17,21 +17,22 @@
 //!
 //! - `xml` or `XML`, the default path for `DBus` XML files - or is set by the
 //! - `LOCKSTEP_XML_PATH`, the env variable that overrides the default.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.3.1")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.4")]
 #![allow(clippy::missing_errors_doc)]
 
+mod error;
 mod macros;
-mod utils;
 
 use std::io::Read;
 
+pub use error::LockstepError;
 pub use macros::resolve_xml_path;
-pub use utils::signatures_are_eq;
-use zbus::{
-    xml::{Arg, Node},
-    zvariant::Signature,
-    Error::{InterfaceNotFound, MissingParameter},
+use zbus_xml::{
+    ArgDirection::{In, Out},
+    Node,
 };
+use zvariant::Signature;
+use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, PropertyNotFound};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -53,8 +54,8 @@ pub enum MsgType {
 /// # use std::fs::File;
 /// # use std::io::{Seek, SeekFrom, Write};
 /// # use tempfile::tempfile;
-/// use zbus::zvariant::{Signature, Type, OwnedObjectPath};
-/// use zbus_lockstep::{get_signal_body_type, signatures_are_eq, assert_eq_signatures};
+/// use zvariant::{Signature, Type, OwnedObjectPath};
+/// use zbus_lockstep::get_signal_body_type;
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
 /// <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
@@ -83,22 +84,8 @@ pub enum MsgType {
 /// // Single `DBus` type codes, here 'o', are returned as a single character.
 /// // Also, signal body types (often) omit the struct or tuple type parentheses.
 ///
-/// assert_ne!(signature, DeviceEvent::signature());
-///
-/// // However, the signatures are equivalent.
-///
-/// assert!(signatures_are_eq(&signature, &DeviceEvent::signature()));  
-///
-/// // If you want to check that the signatures are equivalent, you can use the
-/// // assert_eq_signatures! macro.
-///     
-/// assert_eq_signatures!(&signature, &DeviceEvent::signature());
+/// assert_eq!(&signature, &DeviceEvent::signature());
 /// ```
-///
-/// # Notes
-///
-/// See [`signatures_are_eq`] for more information about
-/// comparing signatures.
 pub fn get_signal_body_type<'a>(
     mut xml: impl Read,
     interface_name: &str,
@@ -111,13 +98,13 @@ pub fn get_signal_body_type<'a>(
     let interface = interfaces
         .iter()
         .find(|iface| iface.name() == interface_name)
-        .ok_or(InterfaceNotFound)?;
+        .ok_or(InterfaceNotFound(interface_name.to_owned()))?;
 
-    let singals = interface.signals();
-    let signal = singals
+    let signals = interface.signals();
+    let signal = signals
         .iter()
         .find(|signal| signal.name() == member_name)
-        .ok_or(MissingParameter("no signal matching supplied member"))?;
+        .ok_or(MemberNotFound(member_name.to_owned()))?;
 
     let signature = {
         if let Some(arg_name) = arg {
@@ -125,10 +112,14 @@ pub fn get_signal_body_type<'a>(
             let arg = args
                 .iter()
                 .find(|arg| arg.name() == Some(arg_name))
-                .ok_or(MissingParameter("no matching argument found"))?;
-            arg.ty().to_owned()
+                .ok_or(ArgumentNotFound(arg_name.to_owned()))?;
+            arg.ty().to_string()
         } else {
-            signal.args().into_iter().map(Arg::ty).collect::<String>()
+            signal
+                .args()
+                .iter()
+                .map(|arg| arg.ty().to_string())
+                .collect::<String>()
         }
     };
     Ok(Signature::from_string_unchecked(signature))
@@ -142,7 +133,7 @@ pub fn get_signal_body_type<'a>(
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zbus::zvariant::Type;
+/// use zvariant::Type;
 /// use zbus_lockstep::get_property_type;
 ///     
 /// #[derive(Debug, PartialEq, Type)]
@@ -177,15 +168,15 @@ pub fn get_property_type<'a>(
     let interface = interfaces
         .iter()
         .find(|iface| iface.name() == interface_name)
-        .ok_or(InterfaceNotFound)?;
+        .ok_or(InterfaceNotFound(interface_name.to_string()))?;
 
     let properties = interface.properties();
     let property = properties
         .iter()
         .find(|property| property.name() == property_name)
-        .ok_or(MissingParameter("no property matching supplied member"))?;
+        .ok_or(PropertyNotFound(property_name.to_owned()))?;
 
-    let signature = property.ty().to_owned();
+    let signature = property.ty().to_string();
     Ok(Signature::from_string_unchecked(signature))
 }
 
@@ -201,7 +192,7 @@ pub fn get_property_type<'a>(
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zbus::zvariant::Type;
+/// use zvariant::Type;
 /// use zbus_lockstep::get_method_return_type;
 ///     
 /// #[derive(Debug, PartialEq, Type)]
@@ -245,27 +236,31 @@ pub fn get_method_return_type<'a>(
     let interface = interfaces
         .iter()
         .find(|iface| iface.name() == interface_name)
-        .ok_or(InterfaceNotFound)?;
+        .ok_or(InterfaceNotFound(interface_name.to_string()))?;
 
     let methods = interface.methods();
     let method = methods
         .iter()
         .find(|method| method.name() == member_name)
-        .ok_or(MissingParameter("no method matches supplied member"))?;
+        .ok_or(MemberNotFound(member_name.to_string()))?;
 
     let args = method.args();
 
-    let signature = if arg_name.is_some() {
-        args.iter()
-            .find(|arg| arg.name() == arg_name)
-            .ok_or(MissingParameter("no matching argument found"))?
-            .ty()
-            .to_owned()
-    } else {
-        args.iter()
-            .filter(|arg| arg.direction() == Some("out"))
-            .map(|arg| arg.ty())
-            .collect::<String>()
+    let signature = {
+        if arg_name.is_some() {
+            args.iter()
+                .find(|arg| arg.name() == arg_name)
+                .ok_or(ArgumentNotFound(
+                    arg_name.expect("arg_name guarded by 'is_some'").to_string(),
+                ))?
+                .ty()
+                .to_string()
+        } else {
+            args.iter()
+                .filter(|arg| arg.direction() == Some(Out))
+                .map(|arg| arg.ty().to_string())
+                .collect::<String>()
+        }
     };
 
     Ok(Signature::from_string_unchecked(signature))
@@ -286,9 +281,8 @@ pub fn get_method_return_type<'a>(
 /// use std::collections::HashMap;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zbus::zvariant::{Type, Value};
+/// use zvariant::{Type, Value};
 /// use zbus_lockstep::get_method_args_type;
-/// use zbus_lockstep::assert_eq_signatures;
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
 /// <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
@@ -328,7 +322,7 @@ pub fn get_method_return_type<'a>(
 /// let member_name = "Notify";
 ///     
 /// let signature = get_method_args_type(xml_file, interface_name, member_name, None).unwrap();
-/// assert_eq_signatures!(&signature, &Notification::signature());
+/// assert_eq!(&signature, &Notification::signature());
 /// ```
 pub fn get_method_args_type<'a>(
     mut xml: impl Read,
@@ -342,26 +336,28 @@ pub fn get_method_args_type<'a>(
     let interface = interfaces
         .iter()
         .find(|iface| iface.name() == interface_name)
-        .ok_or(InterfaceNotFound)?;
+        .ok_or(InterfaceNotFound(interface_name.to_owned()))?;
 
     let methods = interface.methods();
     let method = methods
         .iter()
         .find(|method| method.name() == member_name)
-        .ok_or(MissingParameter("no method matches supplied member"))?;
+        .ok_or(member_name.to_owned())?;
 
     let args = method.args();
 
     let signature = if arg_name.is_some() {
         args.iter()
             .find(|arg| arg.name() == arg_name)
-            .ok_or(MissingParameter("no matching argument found"))?
+            .ok_or(ArgumentNotFound(
+                arg_name.expect("arg_name guarded by is_some").to_string(),
+            ))?
             .ty()
-            .to_owned()
+            .to_string()
     } else {
         args.iter()
-            .filter(|arg| arg.direction() == Some("in"))
-            .map(|arg| arg.ty())
+            .filter(|arg| arg.direction() == Some(In))
+            .map(|arg| arg.ty().to_string())
             .collect::<String>()
     };
 
@@ -373,7 +369,7 @@ mod test {
     use std::io::{Seek, SeekFrom, Write};
 
     use tempfile::tempfile;
-    use zbus::zvariant::{OwnedObjectPath, Type};
+    use zvariant::{OwnedObjectPath, Type};
 
     use crate::get_signal_body_type;
 

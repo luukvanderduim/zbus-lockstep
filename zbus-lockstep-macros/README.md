@@ -22,7 +22,7 @@ Add `zbus-lockstep-macros` to `Cargo.toml`'s dependencies:
 
 ```toml
 [dependencies]
-zbus-lockstep-macros = "0.3.1"
+zbus-lockstep-macros = "0.4"
 ```
 
 If the `DBus` XML descriptions can be found in the crates root,
@@ -30,7 +30,7 @@ in either `xml/` or `XML/`, validating the type can be as easy as:
 
 ```rust
  use zbus_lockstep_macros::validate;
- use zbus::zvariant::Type;
+ use zvariant::Type;
 
  #[validate]
  #[derive(Type)]

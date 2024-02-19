@@ -1,11 +1,11 @@
 //! # zbus-lockstep-macros
 //!
 //! This provides the `validate` macro that builds on `zbus-lockstep`.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep-macros/0.3.1")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep-macros/0.4")]
 
 type Result<T> = std::result::Result<T, syn::Error>;
 
-use std::{collections::HashMap, path::PathBuf, str::FromStr};
+use std::{collections::HashMap, path::PathBuf};
 
 use proc_macro::TokenStream;
 use quote::quote;
@@ -152,7 +152,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     // Iterate over `xml_files` and find the signal that is contained in the struct's name.
     // Or if `signal_arg` is provided, use that.
     for (path_key, xml_string) in xml_files {
-        let node = zbus::xml::Node::from_str(&xml_string);
+        let node = zbus_xml::Node::try_from(xml_string.as_str());
 
         if node.is_err() {
             return syn::Error::new(
@@ -172,25 +172,30 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
         for interface in node.interfaces() {
             // We were called with an interface argument, so if the interface name does not match,
             // skip it.
-            if args.interface.is_some() && interface.name() != args.interface.as_ref().unwrap() {
+            if args.interface.is_some()
+                && interface.name().as_str() != args.interface.as_ref().unwrap()
+            {
                 continue;
             }
 
             for signal in interface.signals() {
-                if args.signal.is_some() && signal.name() != args.signal.as_ref().unwrap() {
+                if args.signal.is_some() && signal.name().as_str() != args.signal.as_ref().unwrap()
+                {
                     continue;
                 }
 
                 let xml_signal_name = signal.name();
 
-                if args.signal.is_some() && xml_signal_name == args.signal.as_ref().unwrap() {
+                if args.signal.is_some()
+                    && xml_signal_name.as_str() == args.signal.as_ref().unwrap()
+                {
                     interface_name = Some(interface.name().to_string());
                     signal_name = Some(xml_signal_name.to_string());
                     xml_file_path = Some(path_key.clone());
                     continue;
                 }
 
-                if item_name.contains(xml_signal_name) {
+                if item_name.contains(xml_signal_name.as_str()) {
                     // If we have found a signal with the same name in an earlier iteration:
                     if interface_name.is_some() && signal_name.is_some() {
                         return syn::Error::new(
@@ -248,9 +253,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
         #[test]
         fn #test_name() {
-            use zbus::zvariant::{self, Type};
-            use zbus_lockstep::{signatures_are_eq, assert_eq_signatures};
-
+            use zvariant::{self, Type};
             let xml_file = std::fs::File::open(#xml_file_path).expect(#xml_file_path);
 
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(
@@ -262,7 +265,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
             let item_signature_from_struct = <#item_struct_name as zvariant::Type>::signature();
 
-            assert_eq_signatures!(&item_signature_from_xml, &item_signature_from_struct);
+            assert_eq!(&item_signature_from_xml, &item_signature_from_struct);
         }
     };
 
