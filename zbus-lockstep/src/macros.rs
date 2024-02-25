@@ -650,7 +650,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -659,7 +659,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("AddNode", "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -668,7 +668,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
@@ -677,7 +677,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::signal_body_type_signature!("Alert", "org.example.Node", "volume");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("d"));
+        assert_eq!(sig, Signature::from_str_unchecked("d"));
     }
 
     #[test]
@@ -690,7 +690,7 @@ mod test {
             interface: "org.example.Node",
             argument: "urgent"
         );
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("b"));
+        assert_eq!(sig, Signature::from_str_unchecked("b"));
     }
 
     #[test]
@@ -699,7 +699,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -708,7 +708,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!(member: "RequestName");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -717,7 +717,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -726,7 +726,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(su)"));
+        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
@@ -735,7 +735,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node", "apple");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("s"));
+        assert_eq!(sig, Signature::from_str_unchecked("s"));
     }
 
     #[test]
@@ -748,7 +748,7 @@ mod test {
             interface: "org.example.Node",
             argument: "orange"
         );
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -757,7 +757,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!("RequestName");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -766,7 +766,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!(member: "RequestName");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -775,7 +775,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!("RequestName", "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -784,7 +784,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::method_return_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -794,7 +794,7 @@ mod test {
 
         let sig =
             zbus_lockstep::method_return_signature!("RequestName", "org.example.Node", "grape");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -807,7 +807,7 @@ mod test {
             interface: "org.example.Node",
             argument: "grape"
         );
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("u"));
+        assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
@@ -816,7 +816,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!("Features");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -825,7 +825,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!(member: "Features");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -834,7 +834,7 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!("Features", "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
@@ -843,6 +843,6 @@ mod test {
         std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 
         let sig = zbus_lockstep::property_type_signature!(member: "Features", interface: "org.example.Node");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("as"));
+        assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 }
