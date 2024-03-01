@@ -5,7 +5,7 @@
 
 This repository is home to `zbus-lockstep` and `zbus-lockstep-macros`.
 
-These crates help keep type definitions in lockstep with DBus XML descriptions, using [`zbus`](<https://github.com/dbus2/zbus>).
+These crates help keep type definitions in lockstep with DBus XML descriptions, using [`zbus-xml`](<https://github.com/dbus2/zbus>).
 
 These offer means to match your type's signature - [`<T as zvariant::Type>::signature()`](https://docs.rs/zvariant/latest/zvariant/trait.Type.html#tymethod.signature) - with a corresponding signature retrieved from a DBus XML file.
 
