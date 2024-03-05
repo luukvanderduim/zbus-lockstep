@@ -22,7 +22,7 @@ Add `zbus-lockstep-macros` to `Cargo.toml`'s dependencies:
 
 ```toml
 [dependencies]
-zbus-lockstep-macros = "0.4"
+zbus-lockstep-macros = "0.4.1"
 ```
 
 If the `DBus` XML descriptions can be found in the crates root,
