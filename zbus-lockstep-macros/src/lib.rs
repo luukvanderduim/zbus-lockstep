@@ -251,19 +251,19 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let item_plus_validation_test = quote! {
         #item_struct
 
+        #[cfg(test)]
         #[test]
         fn #test_name() {
-            use zvariant::{self, Type};
-            let xml_file = std::fs::File::open(#xml_file_path).expect(#xml_file_path);
+            use zvariant::Type;
 
+            let xml_file = std::fs::File::open(#xml_file_path).expect("\"#xml_file_path\" expected to be a valid file path." );
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(
                 xml_file,
                 #interface_name,
                 #signal_name,
                 None
-            ).expect("Failed to get signal body type from XML file");
-
-            let item_signature_from_struct = <#item_struct_name as zvariant::Type>::signature();
+            ).expect("Failed to get signal body type from XML file.");
+            let item_signature_from_struct = <#item_struct_name as Type>::signature();
 
             assert_eq!(&item_signature_from_xml, &item_signature_from_struct);
         }
