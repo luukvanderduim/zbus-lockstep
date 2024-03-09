@@ -36,7 +36,7 @@ use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, Propert
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum MsgType {
     Method,
     Signal,
