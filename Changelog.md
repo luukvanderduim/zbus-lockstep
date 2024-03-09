@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+---
+
+## [zbus-lockstep-v0.4.2] - 2023-03-09
+
+### 🚸 Improve UX
+
+- 🚸 Remove requirement `zbus_xml` to be in scope at macro call site.  
+- Add `Copy`, `Clone`, `Hash`, to public `MshType`.
+
 ## [zbus-lockstep-v0.4.1] - 2023-03-05
 
 ### 📝 Documentation
