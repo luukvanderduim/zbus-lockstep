@@ -31,7 +31,7 @@ use crate::Result;
 /// ```
 /// # Panics
 ///
-/// Panics if no XML path is provided and no default XML path is not found.
+/// Panics if no XML path is provided and the default XML path is not found.
 pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     let mut xml = xml;
 
@@ -106,7 +106,7 @@ macro_rules! find_definition_in_dbus_xml {
 
         let entry_path = entry.path().clone();
         let file = std::fs::File::open(entry.path()).expect("Failed to open file");
-        let node = zbus_xml::Node::from_reader(file).expect("Failed to parse XML file");
+        let node = zbus_lockstep::zbus_xml::Node::from_reader(file).expect("Failed to parse XML file");
 
         for interface in node.interfaces() {
             // If called with an `iface` arg, skip he interfaces that do not match.

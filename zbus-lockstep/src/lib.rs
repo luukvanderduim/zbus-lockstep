@@ -27,7 +27,8 @@ use std::io::Read;
 
 pub use error::LockstepError;
 pub use macros::resolve_xml_path;
-use zbus_xml::{
+pub use zbus_xml::{
+    self,
     ArgDirection::{In, Out},
     Node,
 };
