@@ -79,11 +79,14 @@ use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Toke
 /// }
 /// ```
 ///
+/// ## Multiple arguments
+///
+/// You can provide multiple arguments with a comma separated list.
 ///
 /// # Examples
 ///
 /// ```ignore
-/// #[validate(xml: "xml")]
+/// #[validate(xml: "xml", interface: "org.example.Node", signal: "RemoveNode")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
 ///    name: String,
@@ -313,6 +316,10 @@ impl syn::parse::Parse for ValidateArgs {
                         format!("Unexpected argument: {ident}"),
                     ))
                 }
+            }
+
+            if !input.is_empty() {
+                input.parse::<Token![,]>()?;
             }
         }
 
