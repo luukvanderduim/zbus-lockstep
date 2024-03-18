@@ -34,27 +34,45 @@ use crate::Result;
 /// Panics if no XML path is provided and the default XML path is not found.
 pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     let mut xml = xml;
-
     let current_dir: PathBuf = std::env::current_dir()?;
 
-    let default_xml_path = current_dir.join("xml");
-    let default_xml_path_alt = current_dir.join("XML");
+    let current_dir_lower_case = current_dir.join("xml");
+    let current_dir_upper_case = current_dir.join("XML");
+
+    let parent_dir_lower_case = current_dir.join("../xml");
+    let parent_dir_upper_case = current_dir.join("../XML");
 
     // If no XML path is provided, try to find the default XML path.
     if xml.is_none() {
-        if default_xml_path.exists() {
+        if current_dir_lower_case.exists() {
             xml = Some(
-                default_xml_path
+                current_dir_lower_case
                     .to_str()
-                    .expect("default_xml_path is valid UTF-8"),
+                    .expect("current_dir_lower_case is valid UTF-8"),
             );
         }
 
-        if default_xml_path_alt.exists() {
+        if current_dir_upper_case.exists() {
             xml = Some(
-                default_xml_path_alt
+                current_dir_upper_case
                     .to_str()
-                    .expect("default_xml_path is valid UTF-8"),
+                    .expect("current_dir_upper_case is valid UTF-8"),
+            );
+        }
+
+        if parent_dir_lower_case.exists() {
+            xml = Some(
+                parent_dir_lower_case
+                    .to_str()
+                    .expect("parent_dir_lower_case is valid UTF-8"),
+            );
+        }
+
+        if parent_dir_upper_case.exists() {
+            xml = Some(
+                parent_dir_upper_case
+                    .to_str()
+                    .expect("parent_dir_upper_case is valid UTF-8"),
             );
         }
     }
