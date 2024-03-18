@@ -36,11 +36,17 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     let mut xml = xml;
     let current_dir: PathBuf = std::env::current_dir()?;
 
+    // We want to know the name of the crate we are expanded in.
+    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
+
     let current_dir_lower_case = current_dir.join("xml");
     let current_dir_upper_case = current_dir.join("XML");
 
     let parent_dir_lower_case = current_dir.join("../xml");
     let parent_dir_upper_case = current_dir.join("../XML");
+
+    let crate_dir_lower_case = current_dir.join(&crate_name).join("xml");
+    let crate_dir_upper_case = current_dir.join(&crate_name).join("XML");
 
     // If no XML path is provided, try to find the default XML path.
     if xml.is_none() {
@@ -73,6 +79,22 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
                 parent_dir_upper_case
                     .to_str()
                     .expect("parent_dir_upper_case is valid UTF-8"),
+            );
+        }
+
+        if crate_dir_lower_case.exists() {
+            xml = Some(
+                crate_dir_lower_case
+                    .to_str()
+                    .expect("crate_dir_lower_case is valid UTF-8"),
+            );
+        }
+
+        if crate_dir_upper_case.exists() {
+            xml = Some(
+                crate_dir_upper_case
+                    .to_str()
+                    .expect("crate_dir_upper_case is valid UTF-8"),
             );
         }
     }
