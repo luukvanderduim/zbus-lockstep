@@ -9,7 +9,7 @@ use crate::Result;
 /// Resolve XML path from either:
 ///
 /// - provided argument,
-/// - default location (`xml/` or `XML/`) or
+/// - default location (`xml/`, `XML/`, `../xml` or `../XML`) or
 /// - env_variable (`LOCKSTEP_XML_PATH`)
 ///
 /// If no XML path is provided, it tries to find the default XML path.
