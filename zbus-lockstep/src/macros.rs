@@ -101,12 +101,12 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
 #[macro_export]
 macro_rules! find_definition_in_dbus_xml {
     ($xml_path_buf:expr, $member:expr, $iface:expr, $msg_type:expr) => {{
-    use zbus_lockstep::MsgType;
+    use $crate::MsgType;
 
     let xml_path_buf: std::path::PathBuf = $xml_path_buf;
     let member: &str = $member;
     let iface: Option<String> = $iface;
-    let msg_type: zbus_lockstep::MsgType = $msg_type;
+    let msg_type: MsgType = $msg_type;
 
     let mut xml_file_path = None;
     let mut interface_name = None;
@@ -124,7 +124,7 @@ macro_rules! find_definition_in_dbus_xml {
 
         let entry_path = entry.path().clone();
         let file = std::fs::File::open(entry.path()).expect("Failed to open file");
-        let node = zbus_lockstep::zbus_xml::Node::from_reader(file).expect("Failed to parse XML file");
+        let node = $crate::zbus_xml::Node::from_reader(file).expect("Failed to parse XML file");
 
         for interface in node.interfaces() {
             // If called with an `iface` arg, skip he interfaces that do not match.
@@ -235,84 +235,80 @@ macro_rules! find_definition_in_dbus_xml {
 #[macro_export]
 macro_rules! method_return_signature {
     ($member:expr) => {{
+        use $crate::MsgType;
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
+            $crate::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_return_type(file, &interface_name, member, None)
+        $crate::get_method_return_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr) => {
-        method_return_signature!($member)
+        $crate::method_return_signature!($member)
     };
 
     ($member:expr, $interface:expr) => {{
         let member = $member;
+        use $crate::MsgType;
+
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Method
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_return_type(file, &interface_name, member, None)
+        $crate::get_method_return_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr) => {
-        method_return_signature!($member, $interface)
+        $crate::method_return_signature!($member, $interface)
     };
 
     ($member:expr, $interface:expr, $argument:expr) => {{
         let member = $member;
-        let interface = Some($interface.to_string());
+        use $crate::MsgType;
 
+        let interface = Some($interface.to_string());
         let argument = Some($argument);
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Method
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_return_type(file, &interface_name, member, argument)
+        $crate::get_method_return_type(file, &interface_name, member, argument)
             .expect("Failed to get method argument(s) type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr, argument: $argument:expr) => {
-        method_return_signature!($member, $interface, $argument)
+        $crate::method_return_signature!($member, $interface, $argument)
     };
 }
 
@@ -358,57 +354,57 @@ macro_rules! method_return_signature {
 #[macro_export]
 macro_rules! method_args_signature {
     ($member:expr) => {{
+        use $crate::MsgType;
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
+            $crate::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_args_type(file, &interface_name, member, None)
+        $crate::get_method_args_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr) => {
-        method_args_signature!($member)
+        $crate::method_args_signature!($member)
     };
 
     ($member:expr, $interface:expr) => {{
+        use $crate::MsgType;
         let member = $member;
+
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Method
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_args_type(file, &interface_name, member, None)
+        $crate::get_method_args_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr) => {
-        method_args_signature!($member, $interface)
+        $crate::method_args_signature!($member, $interface)
     };
 
     ($member:expr, $interface:expr, $argument:expr) => {{
+        use $crate::MsgType;
         let member = $member;
         let interface = Some($interface.to_string());
 
@@ -417,25 +413,21 @@ macro_rules! method_args_signature {
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
 
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Method
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_method_args_type(file, &interface_name, member, argument)
+        $crate::get_method_args_type(file, &interface_name, member, argument)
             .expect("Failed to get method argument(s) type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr, argument: $argument:expr) => {
-        method_args_signature!($member, $interface, $argument)
+        $crate::method_args_signature!($member, $interface, $argument)
     };
 }
 
@@ -478,58 +470,57 @@ macro_rules! method_args_signature {
 #[macro_export]
 macro_rules! signal_body_type_signature {
     ($member:expr) => {{
+        use $crate::MsgType;
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Signal);
+            $crate::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Signal);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
 
-        zbus_lockstep::get_signal_body_type(file, &interface_name, member, None)
+        $crate::get_signal_body_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr) => {
-        signal_body_type_signature!($member)
+        $crate::signal_body_type_signature!($member)
     };
 
     ($member:expr, $interface:expr) => {{
+        use $crate::MsgType;
         let member = $member;
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Signal
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Signal);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_signal_body_type(file, &interface_name, member, None)
+        $crate::get_signal_body_type(file, &interface_name, member, None)
             .expect("Failed to get method arguments type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr) => {
-        signal_body_type_signature!($member, $interface)
+        $crate::signal_body_type_signature!($member, $interface)
     };
 
     ($member:expr, $interface:expr, $argument:expr) => {{
+        use $crate::MsgType;
         let member = $member;
         let interface = Some($interface.to_string());
 
@@ -538,25 +529,22 @@ macro_rules! signal_body_type_signature {
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
 
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
+
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Signal
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Signal);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_signal_body_type(file, &interface_name, member, argument)
+        $crate::get_signal_body_type(file, &interface_name, member, argument)
             .expect("Failed to get method argument(s) type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr, argument: $argument:expr) => {
-        signal_body_type_signature!($member, $interface, $argument)
+        $crate::signal_body_type_signature!($member, $interface, $argument)
     };
 }
 
@@ -594,55 +582,53 @@ macro_rules! signal_body_type_signature {
 #[macro_export]
 macro_rules! property_type_signature {
     ($member:expr) => {{
+        use $crate::MsgType;
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
-            zbus_lockstep::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Property);
+            $crate::find_definition_in_dbus_xml!(xml_path, member, None, MsgType::Property);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
 
-        zbus_lockstep::get_property_type(file, &interface_name, member)
+        $crate::get_property_type(file, &interface_name, member)
             .expect("Failed to get property type signature")
     }};
 
     (member: $member:expr) => {
-        property_type_signature!($member)
+        $crate::property_type_signature!($member)
     };
 
     ($member:expr, $interface:expr) => {{
+        use $crate::MsgType;
         let member = $member;
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
         let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = zbus_lockstep::resolve_xml_path(None).expect(&format!(
+        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
             "Failed to resolve XML path, current dir: {}",
             current_dir.to_str().unwrap()
         ));
 
         // Find the definition of the method in the XML specification.
-        let (file_path, interface_name) = zbus_lockstep::find_definition_in_dbus_xml!(
-            xml_path,
-            member,
-            interface,
-            MsgType::Property
-        );
+        let (file_path, interface_name) =
+            $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Property);
 
         let file = std::fs::File::open(file_path).expect("Failed to open file");
-        zbus_lockstep::get_property_type(file, &interface_name, member)
+        $crate::get_property_type(file, &interface_name, member)
             .expect("Failed to get property type signature")
     }};
 
     (member: $member:expr, interface: $interface:expr) => {
-        property_type_signature!($member, $interface)
+        $crate::property_type_signature!($member, $interface)
     };
 }
 
@@ -650,60 +636,46 @@ macro_rules! property_type_signature {
 mod test {
     use zvariant::Signature;
 
-    use crate as zbus_lockstep;
     use crate::signal_body_type_signature;
 
     #[test]
     fn test_signal_body_signature_macro() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+        // path to XML files can be set by environment variable
+        // std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+        // But `resolve_xml_path` can find the `xml` in parent by itself.
 
-        let sig = zbus_lockstep::signal_body_type_signature!("AddNode");
+        let sig = crate::signal_body_type_signature!("AddNode");
         assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_identifier() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode");
+        let sig = crate::signal_body_type_signature!(member: "AddNode");
         assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::signal_body_type_signature!("AddNode", "org.example.Node");
+        let sig = crate::signal_body_type_signature!("AddNode", "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_interface_and_identifiers() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
+        let sig =
+            crate::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("(so)"));
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_argument_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::signal_body_type_signature!("Alert", "org.example.Node", "volume");
+        let sig = crate::signal_body_type_signature!("Alert", "org.example.Node", "volume");
         assert_eq!(sig, Signature::from_str_unchecked("d"));
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_argument_and_identifiers_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::signal_body_type_signature!(
+        let sig = crate::signal_body_type_signature!(
             member: "Alert",
             interface: "org.example.Node",
             argument: "urgent"
@@ -713,55 +685,38 @@ mod test {
 
     #[test]
     fn test_method_args_signature_macro() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!("RequestName");
+        let sig = crate::method_args_signature!("RequestName");
         assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
     fn test_method_args_signature_macro_with_identifier() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!(member: "RequestName");
+        let sig = crate::method_args_signature!(member: "RequestName");
         assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
     fn test_method_args_signature_macro_with_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node");
+        let sig = crate::method_args_signature!("RequestName", "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
     fn test_method_args_signature_macro_with_interface_and_identifiers() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!(member: "RequestName", interface: "org.example.Node");
+        let sig =
+            crate::method_args_signature!(member: "RequestName", interface: "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("(su)"));
     }
 
     #[test]
     fn test_method_args_signature_macro_with_argument_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!("RequestName", "org.example.Node", "apple");
+        let sig = crate::method_args_signature!("RequestName", "org.example.Node", "apple");
         assert_eq!(sig, Signature::from_str_unchecked("s"));
     }
 
     #[test]
     fn test_method_args_signature_macro_with_argument_and_identifiers_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_args_signature!(
+        let sig = crate::method_args_signature!(
             member: "RequestName",
             interface: "org.example.Node",
             argument: "orange"
@@ -771,56 +726,38 @@ mod test {
 
     #[test]
     fn test_method_return_signature_macro() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_return_signature!("RequestName");
+        let sig = crate::method_return_signature!("RequestName");
         assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
     fn test_method_return_signature_macro_with_identifier() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_return_signature!(member: "RequestName");
+        let sig = crate::method_return_signature!(member: "RequestName");
         assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
     fn test_method_return_signature_macro_with_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_return_signature!("RequestName", "org.example.Node");
+        let sig = crate::method_return_signature!("RequestName", "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
     fn test_method_return_signature_macro_with_interface_and_identifiers() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_return_signature!(member: "RequestName", interface: "org.example.Node");
+        let sig =
+            crate::method_return_signature!(member: "RequestName", interface: "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
     fn test_method_return_signature_macro_with_argument_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig =
-            zbus_lockstep::method_return_signature!("RequestName", "org.example.Node", "grape");
+        let sig = crate::method_return_signature!("RequestName", "org.example.Node", "grape");
         assert_eq!(sig, Signature::from_str_unchecked("u"));
     }
 
     #[test]
     fn test_method_return_signature_macro_with_argument_and_identifiers_and_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::method_return_signature!(
+        let sig = crate::method_return_signature!(
             member: "RequestName",
             interface: "org.example.Node",
             argument: "grape"
@@ -830,37 +767,26 @@ mod test {
 
     #[test]
     fn test_property_type_signature_macro() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::property_type_signature!("Features");
+        let sig = crate::property_type_signature!("Features");
         assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
     fn test_property_type_signature_macro_with_identifier() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::property_type_signature!(member: "Features");
+        let sig = crate::property_type_signature!(member: "Features");
         assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
     fn test_property_type_signature_macro_with_interface() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::property_type_signature!("Features", "org.example.Node");
+        let sig = crate::property_type_signature!("Features", "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 
     #[test]
     fn test_property_type_signature_macro_with_interface_and_identifiers() {
-        // path to XML files
-        std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-
-        let sig = zbus_lockstep::property_type_signature!(member: "Features", interface: "org.example.Node");
+        let sig =
+            crate::property_type_signature!(member: "Features", interface: "org.example.Node");
         assert_eq!(sig, Signature::from_str_unchecked("as"));
     }
 }
