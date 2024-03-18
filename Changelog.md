@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [zbus-lockstep-v0.4.3] - 2023-03-18
+
+### 🐛 Fixes  
+
+- 🩹 `validate` now requires a comma separated argument list if multiple arguments are supplied.
+- 🩹 In macros prefer relative paths to absolute paths.
+
+### 📝 Documentation
+
+- 📝 Mention `resolve_xml_path` can now find `..xml/` or `..XML/` too.
+
+### 🧑‍💻 Improve DX
+
+- 🧑‍💻 Be more lenient by adding parent to defaults for `resolve_xml_path`
+
 ## [zbus-lockstep-v0.4.2] - 2023-03-09
 
 ### 🚸 Improve UX
