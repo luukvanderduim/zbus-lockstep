@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [zbus-lockstep-v0.4.4] - 2023-03-18
+
+### 🧑‍💻 Improve DX
+
+- 🧑‍💻 Also look in the directory with the crate name.
+     This is useful if build is invoked from the workspace.
+
 ## [zbus-lockstep-v0.4.3] - 2023-03-18
 
 ### 🐛 Fixes  
