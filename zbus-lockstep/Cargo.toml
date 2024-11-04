@@ -22,8 +22,8 @@ status = "actively-developed"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zbus_xml = { version = "4.0" }
-zvariant = { version = "4.0" }
+zbus_xml = { version = "5.0.1" }
+zvariant = { version = "5.1" }
 
 [dev-dependencies]
 tempfile = "3"

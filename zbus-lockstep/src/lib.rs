@@ -23,7 +23,7 @@
 mod error;
 mod macros;
 
-use std::io::Read;
+use std::{io::Read, str::FromStr};
 
 pub use error::LockstepError;
 pub use macros::resolve_xml_path;
@@ -85,14 +85,14 @@ pub enum MsgType {
 /// // Single `DBus` type codes, here 'o', are returned as a single character.
 /// // Also, signal body types (often) omit the struct or tuple type parentheses.
 ///
-/// assert_eq!(&signature, &DeviceEvent::signature());
+/// assert_eq!(&signature, DeviceEvent::SIGNATURE);
 /// ```
-pub fn get_signal_body_type<'a>(
+pub fn get_signal_body_type(
     mut xml: impl Read,
     interface_name: &str,
     member_name: &str,
     arg: Option<&str>,
-) -> Result<Signature<'a>> {
+) -> Result<Signature> {
     let node = Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
@@ -123,7 +123,7 @@ pub fn get_signal_body_type<'a>(
                 .collect::<String>()
         }
     };
-    Ok(Signature::from_string_unchecked(signature))
+    Ok(Signature::from_str(&signature).map_err(|_| "Invalid signature")?)
 }
 
 /// Retrieve the signature of a property's type from XML.
@@ -156,13 +156,13 @@ pub fn get_signal_body_type<'a>(
 /// let property_name = "InUse";
 ///
 /// let signature = get_property_type(xml_file, interface_name, property_name).unwrap();
-/// assert_eq!(signature, InUse::signature());
+/// assert_eq!(signature, *InUse::SIGNATURE);
 /// ```
-pub fn get_property_type<'a>(
+pub fn get_property_type(
     mut xml: impl Read,
     interface_name: &str,
     property_name: &str,
-) -> Result<Signature<'a>> {
+) -> Result<Signature> {
     let node = Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
@@ -178,7 +178,7 @@ pub fn get_property_type<'a>(
         .ok_or(PropertyNotFound(property_name.to_owned()))?;
 
     let signature = property.ty().to_string();
-    Ok(Signature::from_string_unchecked(signature))
+    Ok(Signature::from_str(&signature).map_err(|_| "Invalid signature")?)
 }
 
 /// Retrieve the signature of a method's return type from XML.
@@ -223,14 +223,14 @@ pub fn get_property_type<'a>(
 /// let member_name = "GetRole";
 ///     
 /// let signature = get_method_return_type(xml_file, interface_name, member_name, None).unwrap();
-/// assert_eq!(signature, Role::signature());
+/// assert_eq!(signature, *Role::SIGNATURE);
 /// ```
-pub fn get_method_return_type<'a>(
+pub fn get_method_return_type(
     mut xml: impl Read,
     interface_name: &str,
     member_name: &str,
     arg_name: Option<&str>,
-) -> Result<Signature<'a>> {
+) -> Result<Signature> {
     let node = Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
@@ -264,7 +264,7 @@ pub fn get_method_return_type<'a>(
         }
     };
 
-    Ok(Signature::from_string_unchecked(signature))
+    Ok(Signature::from_str(&signature).map_err(|_| "Invalid signature")?)
 }
 
 /// Retrieve the signature of a method's argument type from XML.
@@ -323,14 +323,14 @@ pub fn get_method_return_type<'a>(
 /// let member_name = "Notify";
 ///     
 /// let signature = get_method_args_type(xml_file, interface_name, member_name, None).unwrap();
-/// assert_eq!(&signature, &Notification::signature());
+/// assert_eq!(&signature, Notification::SIGNATURE);
 /// ```
-pub fn get_method_args_type<'a>(
+pub fn get_method_args_type(
     mut xml: impl Read,
     interface_name: &str,
     member_name: &str,
     arg_name: Option<&str>,
-) -> Result<Signature<'a>> {
+) -> Result<Signature> {
     let node = Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
@@ -362,12 +362,15 @@ pub fn get_method_args_type<'a>(
             .collect::<String>()
     };
 
-    Ok(Signature::from_string_unchecked(signature))
+    Ok(Signature::from_str(&signature).map_err(|_| "Invalid signature")?)
 }
 
 #[cfg(test)]
 mod test {
-    use std::io::{Seek, SeekFrom, Write};
+    use std::{
+        io::{Seek, SeekFrom, Write},
+        str::FromStr,
+    };
 
     use tempfile::tempfile;
     use zvariant::{OwnedObjectPath, Type};
@@ -415,6 +418,6 @@ mod test {
         let member_name = "AddAccessible";
 
         let signature = get_signal_body_type(xml_file, interface_name, member_name, None).unwrap();
-        assert_eq!(signature, CacheItem::signature());
+        assert_eq!(signature, *CacheItem::SIGNATURE);
     }
 }

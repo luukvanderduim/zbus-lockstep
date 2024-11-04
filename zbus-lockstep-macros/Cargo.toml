@@ -23,8 +23,8 @@ syn = "2.0"
 proc-macro2 = "1.0"
 quote = "1.0"
 zbus-lockstep = { path = "../zbus-lockstep", version = "0.4.4" }
-zbus_xml = "4.0"
-zvariant = "4.0"
+zbus_xml = "5.0.1"
+zvariant = "5.1"
 
 [dev-dependencies]
 version-sync = "0.9"
