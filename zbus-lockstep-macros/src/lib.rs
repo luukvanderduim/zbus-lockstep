@@ -266,9 +266,9 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
                 #signal_name,
                 None
             ).expect("Failed to get signal body type from XML file.");
-            let item_signature_from_struct = <#item_struct_name as Type>::signature();
+            let item_signature_from_struct = <#item_struct_name as Type>::SIGNATURE;
 
-            assert_eq!(&item_signature_from_xml, &item_signature_from_struct);
+            assert_eq!(&item_signature_from_xml, item_signature_from_struct);
         }
     };
 

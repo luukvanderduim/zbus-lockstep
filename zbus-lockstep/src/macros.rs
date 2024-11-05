@@ -234,13 +234,14 @@ macro_rules! find_definition_in_dbus_xml {
 /// Basic usage:
 ///
 /// ```rust
+/// use std::str::FromStr;
 /// use zbus_lockstep::method_return_signature;
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = method_return_signature!("RequestName");
-/// assert_eq!(&sig, &Signature::from_str_unchecked("u"));
+/// assert_eq!(&sig, &Signature::from_str("u").expect("Valid signature pattern"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -353,13 +354,14 @@ macro_rules! method_return_signature {
 /// # Examples
 ///
 /// ```rust
+/// use std::str::FromStr;
 /// use zbus_lockstep::method_args_signature;
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = method_args_signature!("RequestName");
-/// assert_eq!(&sig, &Signature::from_str_unchecked("(su)"));
+/// assert_eq!(&sig, &Signature::from_str("(su)").expect("Valid signature pattern"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -469,13 +471,14 @@ macro_rules! method_args_signature {
 /// # Examples
 ///
 /// ```rust
+/// use std::str::FromStr;
 /// use zbus_lockstep::signal_body_type_signature;
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = signal_body_type_signature!("AddNode");
-/// assert_eq!(&sig, &Signature::from_str_unchecked("(so)"));
+/// assert_eq!(&sig, &Signature::from_str("(so)").expect("Valid signature pattern"));
 /// ```
 /// The macro supports colling arguments with identifiers as well as without.
 /// The macro may also be called with an interface name or interface and argument name:
@@ -586,13 +589,14 @@ macro_rules! signal_body_type_signature {
 /// # Examples
 ///
 /// ```rust
+/// use std::str::FromStr;
 /// use zbus_lockstep::property_type_signature;
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///     
 /// let sig = property_type_signature!("Features");
-/// assert_eq!(&sig, &Signature::from_str_unchecked("as"));
+/// assert_eq!(&sig, &Signature::from_str("as").expect("Valid signature pattern"));
 /// ```
 /// The member name and/or interface name can be used tp identify the arguments:
 ///
@@ -656,6 +660,8 @@ macro_rules! property_type_signature {
 
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use zvariant::Signature;
 
     use crate::signal_body_type_signature;
@@ -667,32 +673,47 @@ mod test {
         // But `resolve_xml_path` can find the `xml` in parent by itself.
 
         let sig = crate::signal_body_type_signature!("AddNode");
-        assert_eq!(&sig, &zvariant::Signature::from_str_unchecked("(so)"));
+        assert_eq!(
+            &sig,
+            &zvariant::Signature::from_str("(so)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_identifier() {
         let sig = crate::signal_body_type_signature!(member: "AddNode");
-        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(so)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_interface() {
         let sig = crate::signal_body_type_signature!("AddNode", "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(so)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_interface_and_identifiers() {
         let sig =
             crate::signal_body_type_signature!(member: "AddNode", interface: "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("(so)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(so)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_signal_body_signature_macro_with_argument_and_interface() {
         let sig = crate::signal_body_type_signature!("Alert", "org.example.Node", "volume");
-        assert_eq!(sig, Signature::from_str_unchecked("d"));
+        assert_eq!(
+            sig,
+            Signature::from_str("d").expect("Valid signature pattern")
+        );
     }
 
     #[test]
@@ -702,38 +723,56 @@ mod test {
             interface: "org.example.Node",
             argument: "urgent"
         );
-        assert_eq!(sig, Signature::from_str_unchecked("b"));
+        assert_eq!(
+            sig,
+            Signature::from_str("b").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_args_signature_macro() {
         let sig = crate::method_args_signature!("RequestName");
-        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(su)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_args_signature_macro_with_identifier() {
         let sig = crate::method_args_signature!(member: "RequestName");
-        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(su)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_args_signature_macro_with_interface() {
         let sig = crate::method_args_signature!("RequestName", "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(su)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_args_signature_macro_with_interface_and_identifiers() {
         let sig =
             crate::method_args_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("(su)"));
+        assert_eq!(
+            sig,
+            Signature::from_str("(su)").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_args_signature_macro_with_argument_and_interface() {
         let sig = crate::method_args_signature!("RequestName", "org.example.Node", "apple");
-        assert_eq!(sig, Signature::from_str_unchecked("s"));
+        assert_eq!(
+            sig,
+            Signature::from_str("s").expect("Valid signature pattern")
+        );
     }
 
     #[test]
@@ -743,38 +782,56 @@ mod test {
             interface: "org.example.Node",
             argument: "orange"
         );
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_return_signature_macro() {
         let sig = crate::method_return_signature!("RequestName");
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Valid signatuee pattern")
+        );
     }
 
     #[test]
     fn test_method_return_signature_macro_with_identifier() {
         let sig = crate::method_return_signature!(member: "RequestName");
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_return_signature_macro_with_interface() {
         let sig = crate::method_return_signature!("RequestName", "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Valid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_return_signature_macro_with_interface_and_identifiers() {
         let sig =
             crate::method_return_signature!(member: "RequestName", interface: "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
     fn test_method_return_signature_macro_with_argument_and_interface() {
         let sig = crate::method_return_signature!("RequestName", "org.example.Node", "grape");
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
@@ -784,31 +841,46 @@ mod test {
             interface: "org.example.Node",
             argument: "grape"
         );
-        assert_eq!(sig, Signature::from_str_unchecked("u"));
+        assert_eq!(
+            sig,
+            Signature::from_str("u").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
     fn test_property_type_signature_macro() {
         let sig = crate::property_type_signature!("Features");
-        assert_eq!(sig, Signature::from_str_unchecked("as"));
+        assert_eq!(
+            sig,
+            Signature::from_str("as").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
     fn test_property_type_signature_macro_with_identifier() {
         let sig = crate::property_type_signature!(member: "Features");
-        assert_eq!(sig, Signature::from_str_unchecked("as"));
+        assert_eq!(
+            sig,
+            Signature::from_str("as").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
     fn test_property_type_signature_macro_with_interface() {
         let sig = crate::property_type_signature!("Features", "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("as"));
+        assert_eq!(
+            sig,
+            Signature::from_str("as").expect("Vlaid signature pattern")
+        );
     }
 
     #[test]
     fn test_property_type_signature_macro_with_interface_and_identifiers() {
         let sig =
             crate::property_type_signature!(member: "Features", interface: "org.example.Node");
-        assert_eq!(sig, Signature::from_str_unchecked("as"));
+        assert_eq!(
+            sig,
+            Signature::from_str("as").expect("Vlaid signature pattern")
+        );
     }
 }
