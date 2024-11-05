@@ -73,6 +73,7 @@ pub enum MsgType {
 /// xml_file.seek(SeekFrom::Start(0)).unwrap();
 ///
 /// #[derive(Debug, PartialEq, Type)]
+/// #[zvariant(signature = "o")]
 /// struct DeviceEvent {
 ///    device: OwnedObjectPath,
 /// }
@@ -81,9 +82,6 @@ pub enum MsgType {
 /// let member_name = "DeviceAdded";
 ///
 /// let signature = get_signal_body_type(xml_file, interface_name, member_name, None).unwrap();
-///
-/// // Single `DBus` type codes, here 'o', are returned as a single character.
-/// // Also, signal body types (often) omit the struct or tuple type parentheses.
 ///
 /// assert_eq!(&signature, DeviceEvent::SIGNATURE);
 /// ```
