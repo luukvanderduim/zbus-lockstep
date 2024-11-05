@@ -367,10 +367,7 @@ pub fn get_method_args_type(
 
 #[cfg(test)]
 mod test {
-    use std::{
-        io::{Seek, SeekFrom, Write},
-        str::FromStr,
-    };
+    use std::io::{Seek, SeekFrom, Write};
 
     use tempfile::tempfile;
     use zvariant::{OwnedObjectPath, Type};
