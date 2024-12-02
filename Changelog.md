@@ -10,10 +10,14 @@ All notable changes to this project will be documented in this file.
 
 ## [zbus-lockstep-v0.4.4] - 2024-03-18
 
+## [zbus-lockstep-v0.4.4] - 2024-03-18
+
 ### 🧑‍💻 Improve DX
 
 - 🧑‍💻 Also look in the directory with the crate name.
      This is useful if build is invoked from the workspace.
+
+## [zbus-lockstep-v0.4.3] - 2024-03-18
 
 ## [zbus-lockstep-v0.4.3] - 2024-03-18
 
@@ -32,10 +36,14 @@ All notable changes to this project will be documented in this file.
 
 ## [zbus-lockstep-v0.4.2] - 2024-03-09
 
+## [zbus-lockstep-v0.4.2] - 2024-03-09
+
 ### 🚸 Improve UX
 
 - 🚸 Remove requirement `zbus_xml` to be in scope at macro call site.  
 - Add `Copy`, `Clone`, `Hash`, to public `MshType`.
+
+## [zbus-lockstep-v0.4.1] - 2024-03-05
 
 ## [zbus-lockstep-v0.4.1] - 2024-03-05
 
