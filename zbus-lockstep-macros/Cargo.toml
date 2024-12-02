@@ -5,7 +5,6 @@ description = "Macros to keep types in lockstep with DBus XML definitions"
 version = "0.5.0"
 edition = "2021"
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
-categories = ["API-bindings"]
 documentation = "https://docs.rs/zbus-lockstep-macro"
 repository = "https://github.com/luukvanderduim/zbus-lockstep"
 readme = "README.md"
