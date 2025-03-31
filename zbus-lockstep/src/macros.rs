@@ -26,7 +26,7 @@ use crate::Result;
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///
 /// let xml_path = resolve_xml_path(None).unwrap();
-/// assert_eq!(xml_path, PathBuf::from("../xml").canonicalize().unwrap());       
+/// assert_eq!(xml_path, PathBuf::from("../xml").canonicalize().unwrap());
 /// # }
 /// ```
 /// # Panics
@@ -34,7 +34,8 @@ use crate::Result;
 /// Panics if no XML path is provided and the default XML path is not found.
 pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     let mut xml = xml;
-    let current_dir: PathBuf = std::env::current_dir()?;
+    let current_dir: PathBuf =
+        PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set"));
 
     // We want to know the name of the crate we are expanded in.
     let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
@@ -239,7 +240,7 @@ macro_rules! find_definition_in_dbus_xml {
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///     
+///
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("u").expect("Valid signature pattern"));
 /// ```
@@ -359,7 +360,7 @@ macro_rules! method_return_signature {
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///     
+///
 /// let sig = method_args_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("(su)").expect("Valid signature pattern"));
 /// ```
@@ -372,7 +373,7 @@ macro_rules! method_return_signature {
 /// let _sig = method_args_signature!("RequestName", "org.example.Node", "apple");
 ///
 /// // or alternatively
-///     
+///
 /// let _sig = method_args_signature!(member: "RequestName", interface: "org.example.Node", argument: "apple");
 /// ```
 #[macro_export]
@@ -476,7 +477,7 @@ macro_rules! method_args_signature {
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///     
+///
 /// let sig = signal_body_type_signature!("AddNode");
 /// assert_eq!(&sig, &Signature::from_str("(so)").expect("Valid signature pattern"));
 /// ```
@@ -594,7 +595,7 @@ macro_rules! signal_body_type_signature {
 /// use zvariant::Signature;
 ///
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///     
+///
 /// let sig = property_type_signature!("Features");
 /// assert_eq!(&sig, &Signature::from_str("as").expect("Valid signature pattern"));
 /// ```
