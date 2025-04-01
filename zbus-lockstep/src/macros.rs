@@ -34,8 +34,10 @@ use crate::Result;
 /// Panics if no XML path is provided and the default XML path is not found.
 pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     let mut xml = xml;
-    let current_dir: PathBuf =
-        PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set"));
+    let current_dir: PathBuf = PathBuf::from(
+        std::env::var("CARGO_MANIFEST_DIR")
+            .expect("the CARGO_MANIFEST_DIR environment variable should be set"),
+    );
 
     // We want to know the name of the crate we are expanded in.
     let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
