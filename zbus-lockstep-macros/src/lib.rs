@@ -9,7 +9,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse::ParseStream, parse_macro_input, Ident, ItemStruct, LitStr, Token};
+use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Token};
 
 /// Validate a struct's type signature against XML signal body type.
 ///
@@ -99,8 +99,8 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as ValidateArgs);
 
     // Parse the item struct.
-    let item_struct = parse_macro_input!(input as ItemStruct);
-    let item_name = item_struct.ident.to_string();
+    let item = parse_macro_input!(input as DeriveInput);
+    let item_name = item.ident.to_string();
 
     let xml_str = args.xml.as_ref().and_then(|p| p.to_str());
 
@@ -245,14 +245,11 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
     let test_name = format!("test_{item_name}_type_signature");
     let test_name = Ident::new(&test_name, proc_macro2::Span::call_site());
 
-    let item_struct_name = item_struct.ident.clone();
-    let item_struct_name = Ident::new(
-        &item_struct_name.to_string(),
-        proc_macro2::Span::call_site(),
-    );
+    let item_name = item.ident.clone();
+    let item_name = Ident::new(&item_name.to_string(), proc_macro2::Span::call_site());
 
     let item_plus_validation_test = quote! {
-        #item_struct
+        #item
 
         #[cfg(test)]
         #[test]
@@ -266,7 +263,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
                 #signal_name,
                 None
             ).expect("Failed to get signal body type from XML file.");
-            let item_signature_from_struct = <#item_struct_name as Type>::SIGNATURE;
+            let item_signature_from_struct = <#item_name as Type>::SIGNATURE;
 
             assert_eq!(&item_signature_from_xml, item_signature_from_struct);
         }
