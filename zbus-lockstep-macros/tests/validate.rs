@@ -5,6 +5,17 @@ use zbus_lockstep_macros::validate;
 use zvariant::{OwnedObjectPath, Type};
 
 #[test]
+fn test_validate_enum() {
+    #[validate(signal: "U32AsEnum")]
+    #[derive(Debug, Type)]
+    enum NodeTypes {
+        _Option1,
+        _Option2,
+    }
+    test_NodeTypes_type_signature();
+}
+
+#[test]
 fn test_validate_macro_node_add_path_as_env_variable() {
     // set env variable to enable validation
     std::env::set_var("LOCKSTEP_XML_PATH", "./xml");
