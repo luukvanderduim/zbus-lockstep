@@ -85,7 +85,11 @@ use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Tok
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```rust
+/// use zvariant::OwnedObjectPath;
+/// use zbus_lockstep_macros::validate;
+/// use zvariant::Type;
+///
 /// #[validate(xml: "xml", interface: "org.example.Node", signal: "RemoveNode")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
