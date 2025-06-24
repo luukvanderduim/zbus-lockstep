@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [zbus-lockstep-v0.5.1] - 2025-06-24
+
+feat: make `[validate]` attribute more flexible (#6) Tait Hoyem
+     * Add support for any type - no longer restrict to structs.
+
+build: Support bazel - (#5) by Nils Andre
+    use CARGO_MANIFEST_DIR instead of current dir.
+
 ## [zbus-lockstep-v0.5.0] - 2024-12-02
 
 ### Update dependencies
