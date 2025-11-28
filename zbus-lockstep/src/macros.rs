@@ -169,7 +169,6 @@ macro_rules! find_definition_in_dbus_xml {
                             }
                             interface_name = Some(interface.name().to_string());
                             xml_file_path = Some(entry_path.clone());
-                            continue;
                         }
                     }
                 }
@@ -184,7 +183,6 @@ macro_rules! find_definition_in_dbus_xml {
                             }
                             interface_name = Some(interface.name().to_string());
                             xml_file_path = Some(entry_path.clone());
-                            continue;
                         }
                     }
                 }
@@ -199,7 +197,6 @@ macro_rules! find_definition_in_dbus_xml {
                             }
                             interface_name = Some(interface.name().to_string());
                             xml_file_path = Some(entry_path.clone());
-                            continue;
                         }
                     }
                 }
