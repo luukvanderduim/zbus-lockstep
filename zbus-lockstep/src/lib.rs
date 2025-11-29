@@ -246,12 +246,10 @@ pub fn get_method_return_type(
     let args = method.args();
 
     let signature = {
-        if arg_name.is_some() {
+        if let Some(known_arg_name) = arg_name {
             args.iter()
-                .find(|arg| arg.name() == arg_name)
-                .ok_or(ArgumentNotFound(
-                    arg_name.expect("arg_name guarded by 'is_some'").to_string(),
-                ))?
+                .find(|arg| arg.name() == Some(known_arg_name))
+                .ok_or(ArgumentNotFound(known_arg_name.to_string()))?
                 .ty()
                 .to_string()
         } else {
@@ -345,12 +343,10 @@ pub fn get_method_args_type(
 
     let args = method.args();
 
-    let signature = if arg_name.is_some() {
+    let signature = if let Some(known_arg_name) = arg_name {
         args.iter()
-            .find(|arg| arg.name() == arg_name)
-            .ok_or(ArgumentNotFound(
-                arg_name.expect("arg_name guarded by is_some").to_string(),
-            ))?
+            .find(|arg| arg.name() == Some(known_arg_name))
+            .ok_or(ArgumentNotFound(known_arg_name.to_string()))?
             .ty()
             .to_string()
     } else {
