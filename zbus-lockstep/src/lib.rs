@@ -4,7 +4,7 @@
 //! Useful for comparing these with your types' signatures to ensure that they are compatible.
 //!
 //! It offers functions that retrieve the signature of a method's argument type, of a method's
-//! return type, pf a signal's body type or of a property's type from `DBus` XML.  
+//! return type, pf a signal's body type or of a property's type from `DBus` XML.
 //!
 //! These functions require that you provide the file path to the XML file, the interface name,
 //! and the interface member wherein the signature resides.
@@ -17,7 +17,7 @@
 //!
 //! - `xml` or `XML`, the default path for `DBus` XML files - or is set by the
 //! - `LOCKSTEP_XML_PATH`, the env variable that overrides the default.
-#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.5.1")]
+#![doc(html_root_url = "https://docs.rs/zbus-lockstep/0.5.2")]
 #![allow(clippy::missing_errors_doc)]
 
 mod error;
@@ -47,7 +47,7 @@ pub enum MsgType {
 /// Retrieve a signal's body type signature from `DBus` XML.
 ///
 /// If you provide an argument name, then the signature of that argument is returned.
-/// If you do not provide an argument name, then the signature of all arguments is returned.    
+/// If you do not provide an argument name, then the signature of all arguments is returned.
 ///
 /// # Examples
 ///
@@ -68,7 +68,7 @@ pub enum MsgType {
 /// </node>
 /// "#;
 ///
-/// let mut xml_file: File = tempfile().unwrap();   
+/// let mut xml_file: File = tempfile().unwrap();
 /// xml_file.write_all(xml.as_bytes()).unwrap();
 /// xml_file.seek(SeekFrom::Start(0)).unwrap();
 ///
@@ -127,17 +127,17 @@ pub fn get_signal_body_type(
 /// Retrieve the signature of a property's type from XML.
 ///
 /// # Examples
-///     
+///
 /// ```rust
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
 /// use zvariant::Type;
 /// use zbus_lockstep::get_property_type;
-///     
+///
 /// #[derive(Debug, PartialEq, Type)]
 /// struct InUse(bool);
-///     
+///
 /// let xml = String::from(r#"
 /// <node>
 /// <interface name="org.freedesktop.GeoClue2.Manager">
@@ -149,7 +149,7 @@ pub fn get_signal_body_type(
 /// let mut xml_file: File = tempfile().unwrap();
 /// xml_file.write_all(xml.as_bytes()).unwrap();
 /// xml_file.seek(SeekFrom::Start(0)).unwrap();
-///     
+///
 /// let interface_name = "org.freedesktop.GeoClue2.Manager";
 /// let property_name = "InUse";
 ///
@@ -183,17 +183,17 @@ pub fn get_property_type(
 ///
 /// If you provide an argument name, then the signature of that argument is returned.
 /// If you do not provide an argument name, then the signature of all arguments is returned.
-///     
-///     
+///
+///
 /// # Examples
-///     
+///
 /// ```rust
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
 /// use zvariant::Type;
 /// use zbus_lockstep::get_method_return_type;
-///     
+///
 /// #[derive(Debug, PartialEq, Type)]
 /// #[repr(u32)]
 /// enum Role {
@@ -219,7 +219,7 @@ pub fn get_property_type(
 ///
 /// let interface_name = "org.a11y.atspi.Accessible";
 /// let member_name = "GetRole";
-///     
+///
 /// let signature = get_method_return_type(xml_file, interface_name, member_name, None).unwrap();
 /// assert_eq!(signature, *Role::SIGNATURE);
 /// ```
@@ -307,7 +307,7 @@ pub fn get_method_return_type(
 ///    summary: String,
 ///    body: String,
 ///    actions: Vec<String>,
-///    hints: HashMap<String, Value<'a>>,  
+///    hints: HashMap<String, Value<'a>>,
 ///    expire_timeout: i32,
 /// }
 ///
@@ -317,7 +317,7 @@ pub fn get_method_return_type(
 ///
 /// let interface_name = "org.freedesktop.Notifications";
 /// let member_name = "Notify";
-///     
+///
 /// let signature = get_method_args_type(xml_file, interface_name, member_name, None).unwrap();
 /// assert_eq!(&signature, Notification::SIGNATURE);
 /// ```

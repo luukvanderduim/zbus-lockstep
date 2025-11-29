@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [zbus-lockstep-v0.5.2] - 2025-11-29
+
+chore: Clippy fixes (#8 Tait Hoyem)
+
 ## [zbus-lockstep-v0.5.1] - 2025-06-24
 
 feat: make `[validate]` attribute more flexible (#6) Tait Hoyem
