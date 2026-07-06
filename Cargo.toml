@@ -5,6 +5,12 @@ members = [
 ]
 resolver = "2"
 
+[workspace.dependencies]
+zbus_xml = { version = "5.1.1" }
+zvariant = { version = "5.1" }
+
+
+
 # Metadata below is read by `cargo-release`.
 # pre-release: update the changelog, correct verion numbers in sources.
 
