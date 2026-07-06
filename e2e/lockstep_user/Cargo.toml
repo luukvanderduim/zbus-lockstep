@@ -10,4 +10,4 @@ zvariant = { workspace = true }
 
 [dev-dependencies]
 zbus-lockstep = { path = "../../zbus-lockstep" }
-zbus-lockstep-macros = { path = "../../zbus-lockstep-macros" }
+zb-lsm = { package = "zbus-lockstep-macros", path = "../../zbus-lockstep-macros" }
