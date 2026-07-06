@@ -61,6 +61,12 @@ replace = 'zbus-lockstep = "{{version}}"'
 exact = true
 
 [[workspace.metadata.release.pre-release-replacements]]
+file = "zbus-lockstep/README.md"
+search = 'zb-lsm = { package = "zbus-lockstep-macros", version = "{{prev_version}}" }'
+replace = 'zb-lsm = { package = "zbus-lockstep-macros", version = "{{version}}" }'
+exact = true
+
+[[workspace.metadata.release.pre-release-replacements]]
 file = "zbus-lockstep-macros/README.md"
 search = 'zbus-lockstep-macros = "{{prev_version}}"'
 replace = 'zbus-lockstep-macros = "{{version}}"'
