@@ -1,7 +1,24 @@
-# zbus-lockstep and zbus-lockstep-macros
+<div align="center">
+
+# zbus-lockstep
 
 [![CI](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml/badge.svg)](https://github.com/luukvanderduim/zbus-lockstep/actions/workflows/rust.yml)
 ![Maintenance](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+
+</div>
+
+---
+
+## Table of Contents
+
+- [Motivation](#motivation)
+- [Usage](#usage)
+- [Test-gating `validate`](#test-gating-validate)
+- [Note](#note)
+- [Acknowledgement](#acknowledgement)
+- [License](#license)
+
+---
 
 This repository is home to `zbus-lockstep` and `zbus-lockstep-macros`.
 
@@ -110,7 +127,7 @@ zbus-lockstep = "0.5.2"
 zb-lsm = { package = "zbus-lockstep-macros", version = "0.5.2" }
 ```
 
-See [the end-use example](https://github.com/luukvanderduim/zbus-lockstep/tree/main/e2e/lockstep_user)
+See this in action in [the minimal end-use example.](https://github.com/luukvanderduim/zbus-lockstep/tree/main/e2e/lockstep_user)
 
 ## Note
 
