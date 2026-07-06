@@ -1,0 +1,13 @@
+[package]
+name = "lockstep_user"
+authors = ["Luuk van der Duim"]
+version = "0.1.0"
+edition =  { workspace = true }
+publish = false
+
+[dependencies]
+zvariant = { workspace = true }
+
+[dev-dependencies]
+zbus-lockstep = { path = "../../zbus-lockstep" }
+zbus-lockstep-macros = { path = "../../zbus-lockstep-macros" }

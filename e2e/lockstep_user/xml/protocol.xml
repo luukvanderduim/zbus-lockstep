@@ -1,0 +1,11 @@
+<node>
+  <interface name="org.example.Node">
+
+    <signal name="Alert">
+      <arg name="urgent" type="b"/>
+      <arg name="color" type="s"/>
+      <arg name="volume" type="d"/>
+    </signal>
+
+  </interface>
+</node>

@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "e2e/lockstep_user",
     "zbus-lockstep",
     "zbus-lockstep-macros",
 ]
