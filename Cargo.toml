@@ -5,6 +5,9 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+edition = "2021"
+
 [workspace.dependencies]
 zbus_xml = { version = "5.1.1" }
 zvariant = { version = "5.1" }

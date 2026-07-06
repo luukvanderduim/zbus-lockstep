@@ -6,7 +6,7 @@ authors = [
 ]
 description = "Keep types in lockstep with DBus XML definitions"
 version = "0.5.2"
-edition = "2021"
+edition =  { workspace = true }
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 documentation = "https://docs.rs/zbus-lockstep"
 repository = "https://github.com/luukvanderduim/zbus-lockstep"
