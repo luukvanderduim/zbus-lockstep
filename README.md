@@ -22,8 +22,8 @@ Keeping the types you send over `DBus` in lockstep with currently valid protocol
 
 ## Usage
 
-Consider the followwing XML description,
-an interface with a single, simple signal in the `Cache.xml` file:
+Consider the followwing XML description:
+An interface with a single signal in the `Node.xml` file.
 
 ```XML
 <node>
@@ -37,7 +37,7 @@ an interface with a single, simple signal in the `Cache.xml` file:
 </node>
 ```
 
-The type in our implementation might look like this:
+The associated Rust type might look like this:
 
 ```rust
 #[derive(Type)]
@@ -79,9 +79,38 @@ struct Node {
 }
 ```
 
-Which does essentially the same as the previous example.
+Which does essentially the same as the previous example; it creates a test that validates whether the signature of the `RemoveNode` signal matches the `Node` type.
 
 See either crate and their docs for more details on usage and options.
+
+## Test-gating `validate` 
+
+Users may want to consider gating the `validate` proc-macro to avoid compile-time file I/O during production builds.
+`zbus_lockstep_macros::validate` notifies users when an XML path cannot be found or whether a corresponding definition
+cannot be found for the Rust type. This requires the macro to look for, open, and read the XML files.
+
+By gating the macro with `#[cfg_attr(test, ...)]`, it will only be invoked when building tests:
+
+```rust
+// Note: Cargo automatically translates the hyphen in 'zb-lsm' to an underscore 'zb_lsm' in Rust code.
+#[cfg_attr(test, zb_lsm::validate)]
+#[derive(Type)]
+struct Node {
+    name: String,
+    path: OwnedObjectPath,
+}
+```
+
+Now that `validate` is only built when the cargo test profile is active, 
+users can safely move the dependencies into `[dev-dependencies]`.
+
+```toml
+[dev-dependencies]
+zbus-lockstep = "0.5.2"
+zb-lsm = { package = "zbus-lockstep-macros", version = "0.5.2" }
+```
+
+See [the end-use example](https://github.com/luukvanderduim/zbus-lockstep/tree/main/e2e/lockstep_user)
 
 ## Note
 
