@@ -29,11 +29,9 @@ pub use error::LockstepError;
 pub use macros::resolve_xml_path;
 #[cfg(feature = "macros")]
 pub use zbus_lockstep_macros::validate;
-pub use zbus_xml::{
-    self,
-    ArgDirection::{In, Out},
-    Node,
-};
+#[doc(hidden)]
+pub use zbus_xml;
+use zbus_xml::ArgDirection::{In, Out};
 use zvariant::Signature;
 use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, PropertyNotFound};
 
@@ -93,7 +91,7 @@ pub fn get_signal_body_type(
     member_name: &str,
     arg: Option<&str>,
 ) -> Result<Signature> {
-    let node = Node::from_reader(&mut xml)?;
+    let node = zbus_xml::Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
     let interface = interfaces
@@ -163,7 +161,7 @@ pub fn get_property_type(
     interface_name: &str,
     property_name: &str,
 ) -> Result<Signature> {
-    let node = Node::from_reader(&mut xml)?;
+    let node = zbus_xml::Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
     let interface = interfaces
@@ -231,7 +229,7 @@ pub fn get_method_return_type(
     member_name: &str,
     arg_name: Option<&str>,
 ) -> Result<Signature> {
-    let node = Node::from_reader(&mut xml)?;
+    let node = zbus_xml::Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
     let interface = interfaces
@@ -329,7 +327,7 @@ pub fn get_method_args_type(
     member_name: &str,
     arg_name: Option<&str>,
 ) -> Result<Signature> {
-    let node = Node::from_reader(&mut xml)?;
+    let node = zbus_xml::Node::from_reader(&mut xml)?;
 
     let interfaces = node.interfaces();
     let interface = interfaces
