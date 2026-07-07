@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-07-07
+
+This release documents how to use the crate as `[dev-dependency]`.
+The `validate` macro will return early when env variable `LOCKSTEP_XML_PATH` is found.
+Introduces `macros` feature which re-exports the `validate` proc-macro,
+allowing users to omit the `zbus-lockstep-macros` dependency.
+
+### ✨ Features
+
+- Feat (main)✨: Introduce `macros` feature ([40a3aa9](https://github.com/luukvanderduim/zbus-lockstep/commit/40a3aa98f08c530f21d5afa306a9c98a4a66a6bc))
+
+### ♻️ Refactor / Move files
+
+- Refactor (main)♻️: No more panics inside `resolve_xml_path` ([09e1e67](https://github.com/luukvanderduim/zbus-lockstep/commit/09e1e67af572d7b6f57fc394252073fd2ef78b41))
+- Refactor (macros) ➖: Do not depend on zbus-locstep ([0cdebf6](https://github.com/luukvanderduim/zbus-lockstep/commit/0cdebf65997abf68221f332b168eda35f27a415b))
+
+### Build
+
+- *(⬆️)* Keep `dev-dependencies` latest ([955a5ce](https://github.com/luukvanderduim/zbus-lockstep/commit/955a5ce61430050d18a55ccd0513c80f4ff0170a))
+
+### ✅ Testing and validation
+
+- Tests (macros) ✅: Raise doc `ignore` blocks to tests ([9440a61](https://github.com/luukvanderduim/zbus-lockstep/commit/9440a61a232fab208660230565f4375b5673e0d7))
+
 ## [zbus-lockstep-v0.5.2] - 2025-11-29
 
 chore: Clippy fixes (#8 Tait Hoyem)
