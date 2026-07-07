@@ -8,13 +8,12 @@ use crate::Result;
 
 /// Resolve XML path from either:
 ///
-/// - provided argument,
-/// - default location (`xml/`, `XML/`, `../xml` or `../XML`) or
-/// - env_variable (`LOCKSTEP_XML_PATH`)
+/// This function tries to resolve the XML path from the following sources, in order:
 ///
-/// If no XML path is provided, it tries to find the default XML path.
-/// If the environment variable is set, it overrides the default, or
-/// argument path.
+/// 1. Environment variable (`LOCKSTEP_XML_PATH`)
+/// 2. Provided argument
+/// 3. Default location (`xml/`, `XML/`, `../xml` or `../XML` or `<crate_name>/xml` or
+///    `<crate_name>/XML`)
 ///
 /// # Example
 ///
@@ -25,100 +24,49 @@ use crate::Result;
 /// // path to XML files
 /// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///
-/// let xml_path = resolve_xml_path(None).unwrap();
+/// let xml_path = resolve_xml_path(None).unwrap_or_else(|e| panic!("Failed to resolve XML path: {e}"));
 /// assert_eq!(xml_path, PathBuf::from("../xml").canonicalize().unwrap());
 /// # }
 /// ```
-/// # Panics
-///
-/// Panics if no XML path is provided and the default XML path is not found.
 pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
-    let mut xml = xml;
-    let current_dir: PathBuf = PathBuf::from(
-        std::env::var("CARGO_MANIFEST_DIR")
-            .expect("the CARGO_MANIFEST_DIR environment variable should be set"),
-    );
+    // `LOCKSTEP_XML_PATH` emv variable has precedence over the argument and default paths
+    if let Ok(env_path) = std::env::var("LOCKSTEP_XML_PATH") {
+        return Ok(PathBuf::from(env_path).canonicalize()?);
+    }
 
-    // We want to know the name of the crate we are expanded in.
+    // Provided argument has precedence over the default paths
+    if let Some(arg_path) = xml {
+        return Ok(PathBuf::from(arg_path).canonicalize()?);
+    }
+
+    // Fallback to the default paths:
+
+    let current_dir = PathBuf::from(
+        std::env::var("CARGO_MANIFEST_DIR")
+            .map_err(|e| format!("CARGO_MANIFEST_DIR environment variable is not set: {e}"))?,
+    );
     let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
 
-    let current_dir_lower_case = current_dir.join("xml");
-    let current_dir_upper_case = current_dir.join("XML");
+    let paths_to_try = [
+        current_dir.join("xml"),
+        current_dir.join("XML"),
+        current_dir.join("../xml"),
+        current_dir.join("../XML"),
+        current_dir.join(&crate_name).join("xml"),
+        current_dir.join(&crate_name).join("XML"),
+    ];
 
-    let parent_dir_lower_case = current_dir.join("../xml");
-    let parent_dir_upper_case = current_dir.join("../XML");
-
-    let crate_dir_lower_case = current_dir.join(&crate_name).join("xml");
-    let crate_dir_upper_case = current_dir.join(&crate_name).join("XML");
-
-    // If no XML path is provided, try to find the default XML path.
-    if xml.is_none() {
-        if current_dir_lower_case.exists() {
-            xml = Some(
-                current_dir_lower_case
-                    .to_str()
-                    .expect("current_dir_lower_case is valid UTF-8"),
-            );
-        }
-
-        if current_dir_upper_case.exists() {
-            xml = Some(
-                current_dir_upper_case
-                    .to_str()
-                    .expect("current_dir_upper_case is valid UTF-8"),
-            );
-        }
-
-        if parent_dir_lower_case.exists() {
-            xml = Some(
-                parent_dir_lower_case
-                    .to_str()
-                    .expect("parent_dir_lower_case is valid UTF-8"),
-            );
-        }
-
-        if parent_dir_upper_case.exists() {
-            xml = Some(
-                parent_dir_upper_case
-                    .to_str()
-                    .expect("parent_dir_upper_case is valid UTF-8"),
-            );
-        }
-
-        if crate_dir_lower_case.exists() {
-            xml = Some(
-                crate_dir_lower_case
-                    .to_str()
-                    .expect("crate_dir_lower_case is valid UTF-8"),
-            );
-        }
-
-        if crate_dir_upper_case.exists() {
-            xml = Some(
-                crate_dir_upper_case
-                    .to_str()
-                    .expect("crate_dir_upper_case is valid UTF-8"),
-            );
+    for path in paths_to_try {
+        if path.exists() {
+            return Ok(path.canonicalize()?);
         }
     }
 
-    let env_xml_path = std::env::var("LOCKSTEP_XML_PATH");
-    if env_xml_path.is_ok() {
-        // Override the default, or argument path if the environment variable is set.
-        xml = env_xml_path.as_ref().map(|s| s.as_str()).ok();
-    }
-
-    // If no XML path is provided and the default XML path is not found, panic.
-    if xml.is_none() {
-        panic!(
-            "No XML path provided and default XML path not found. Current dir: \"{}\" ",
-            current_dir.to_str().expect("current_dir is valid UTF-8")
-        );
-    }
-
-    // Convert, canonicalize and return the XML path.
-    let xml = PathBuf::from_str(xml.unwrap())?;
-    Ok(xml.canonicalize()?)
+    Err(format!(
+        "No XML path provided and default XML path not found. Current directory: \"{}\"",
+        current_dir.display()
+    )
+    .into())
 }
 
 /// A generic helper to find the file path and interface name of a member.
@@ -262,11 +210,8 @@ macro_rules! method_return_signature {
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -288,11 +233,8 @@ macro_rules! method_return_signature {
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -315,11 +257,8 @@ macro_rules! method_return_signature {
         let argument = Some($argument);
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -382,11 +321,8 @@ macro_rules! method_args_signature {
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -408,11 +344,8 @@ macro_rules! method_args_signature {
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -435,12 +368,8 @@ macro_rules! method_args_signature {
         let argument = Some($argument);
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
             $crate::find_definition_in_dbus_xml!(xml_path, member, interface, MsgType::Method);
@@ -499,11 +428,8 @@ macro_rules! signal_body_type_signature {
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -525,11 +451,8 @@ macro_rules! signal_body_type_signature {
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -552,12 +475,8 @@ macro_rules! signal_body_type_signature {
         let argument = Some($argument);
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -612,11 +531,8 @@ macro_rules! property_type_signature {
         let member = $member;
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
@@ -638,11 +554,8 @@ macro_rules! property_type_signature {
         let interface = Some($interface.to_string());
 
         // Looking for default path or path specified by environment variable.
-        let current_dir: std::path::PathBuf = std::env::current_dir().unwrap();
-        let xml_path = $crate::resolve_xml_path(None).expect(&format!(
-            "Failed to resolve XML path, current dir: {}",
-            current_dir.to_str().unwrap()
-        ));
+        let xml_path = $crate::resolve_xml_path(None)
+            .unwrap_or_else(|err| panic!("Failed to resolve XML path: {err}"));
 
         // Find the definition of the method in the XML specification.
         let (file_path, interface_name) =
