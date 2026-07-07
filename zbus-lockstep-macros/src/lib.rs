@@ -117,7 +117,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
 
     let xml_str = args.xml.as_ref().and_then(|p| p.to_str());
 
-    let xml = match zbus_lockstep::resolve_xml_path(xml_str) {
+    let xml = match resolve_xml_path(xml_str) {
         Ok(xml) => xml,
         Err(e) => {
             return syn::Error::new(
@@ -339,4 +339,87 @@ impl syn::parse::Parse for ValidateArgs {
             signal,
         })
     }
+}
+
+/// Try to resolve an XML definitions directory.
+///
+/// Matching logic, in order:
+///
+/// 1. Environment variable (`LOCKSTEP_XML_PATH`) overrides everything.
+/// 2. Provided argument (if `Some`) overrides the default location.
+/// 3. Default location fallbacks (only searched if 1 and 2 are not set).
+fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
+    if let Ok(env_path) = std::env::var("LOCKSTEP_XML_PATH") {
+        let xml_path = PathBuf::from(env_path);
+        return xml_path.canonicalize().map_err(|e| {
+            syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!(
+                    "Failed to canonicalize LOCKSTEP_XML_PATH '{}': {}",
+                    xml_path.display(),
+                    e
+                ),
+            )
+        });
+    }
+
+    if let Some(arg_path) = xml {
+        let xml_path = PathBuf::from(arg_path);
+        return xml_path.canonicalize().map_err(|e| {
+            syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!(
+                    "Failed to canonicalize provided XML path '{}': {}",
+                    xml_path.display(),
+                    e
+                ),
+            )
+        });
+    }
+
+    // Try fallback paths:
+
+    let current_dir = std::env::var("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .map_err(|e| {
+            syn::Error::new(
+                proc_macro2::Span::call_site(),
+                format!("CARGO_MANIFEST_DIR environment variable is not set: {e}"),
+            )
+        })?;
+
+    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
+
+    // Definieer de standaardpaden die we willen proberen:
+    let paths_to_try = [
+        current_dir.join("xml"),                   // ./xml
+        current_dir.join("XML"),                   // ./XML
+        current_dir.join("../xml"),                // ../xml
+        current_dir.join("../XML"),                // ../XML
+        current_dir.join(&crate_name).join("xml"), // ./<crate_name>/xml
+        current_dir.join(&crate_name).join("XML"), // ./<crate_name>/XML
+    ];
+
+    for path in paths_to_try {
+        if path.exists() {
+            return path.canonicalize().map_err(|e| {
+                syn::Error::new(
+                    proc_macro2::Span::call_site(),
+                    format!(
+                        "Failed to canonicalize default XML path '{}': {}",
+                        path.display(),
+                        e
+                    ),
+                )
+            });
+        }
+    }
+
+    Err(syn::Error::new(
+        proc_macro2::Span::call_site(),
+        format!(
+            "No XML path provided and default XML path not found. Current directory: \"{}\"",
+            current_dir.display()
+        ),
+    ))
 }
