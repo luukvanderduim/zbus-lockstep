@@ -17,16 +17,13 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history so git-cliff can generate the changelog
 
-      # Generate the changelog using git-cliff purely for the release.
-      # GitHub Actions will use this to show what is in the latest release.
+      # Installeer de kant-en-klare binary (veilig en Docker-vrij!)
+      - name: Install git-cliff
+        uses: taiki-e/install-action@git-cliff
+
+      # Genereer de changelog via het normale commando:
       - name: Generate Changelog
-        id: git-cliff
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --latest --strip header
-        env:
-          OUTPUT: NEW_CHANGELOG.md
+        run: git-cliff --config cliff.toml --latest --strip header -o NEW_CHANGELOG.md
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
