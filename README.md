@@ -12,7 +12,9 @@
 ## Table of Contents
 
 - [Motivation](#motivation)
+- [Import](#import)
 - [Usage](#usage)
+- [Features](#features)
 - [Test-gating `validate`](#test-gating-validate)
 - [Note](#note)
 - [Acknowledgement](#acknowledgement)
@@ -36,6 +38,21 @@ The `XML` protocol-descriptions may act as a shared frame of reference or "singl
 Having a single point of reference helps all implementers meet expectations on protocol conformance.
 
 Keeping the types you send over `DBus` in lockstep with currently valid protocol-descriptions will reduce chances of miscommunication or failure to communicate.
+
+## Import
+
+Add the `zbus-lockstep` crate to your `Cargo.toml` with the `macros` feature enabled:
+
+```toml
+[dev-dependencies]
+zbus-lockstep = { version = "0.5.2", features = ["macros"] }
+```
+
+or, from your shell:
+
+```shell
+cargo add zbus-lockstep --dev --features macros
+```
 
 ## Usage
 
@@ -100,6 +117,15 @@ Which does essentially the same as the previous example; it creates a test that 
 
 See either crate and their docs for more details on usage and options.
 
+## Features
+
+- `macros`: Enables the `zbus-lockstep-macros::validate` proc-macro re-export from `zbus-lockstep`.
+
+```toml
+[dependencies]
+zbus-lockstep = { version = "0.5.2", features = ["macros"] }
+```
+
 ## Test-gating `validate` 
 
 Users may want to consider gating the `validate` proc-macro to avoid compile-time file I/O during production builds.
@@ -110,7 +136,7 @@ By gating the macro with `#[cfg_attr(test, ...)]`, it will only be invoked when 
 
 ```rust
 // Note: Cargo automatically translates the hyphen in 'zb-lsm' to an underscore 'zb_lsm' in Rust code.
-#[cfg_attr(test, zb_lsm::validate)]
+#[cfg_attr(test, zbus_lockstep::validate)]
 #[derive(Type)]
 struct Node {
     name: String,
@@ -119,12 +145,11 @@ struct Node {
 ```
 
 Now that `validate` is only built when the cargo test profile is active, 
-users can safely move the dependencies into `[dev-dependencies]`.
+users can safely move the dependency into `[dev-dependencies]`.
 
 ```toml
 [dev-dependencies]
-zbus-lockstep = "0.5.2"
-zb-lsm = { package = "zbus-lockstep-macros", version = "0.5.2" }
+zbus-lockstep = { version = "0.5.2", features = ["macros"] }
 ```
 
 See this in action in [the minimal end-use example.](https://github.com/luukvanderduim/zbus-lockstep/tree/main/e2e/lockstep_user)

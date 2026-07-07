@@ -57,18 +57,21 @@ search = 'html_root_url = "https://docs.rs/zbus-lockstep-macros/{{prev_version}}
 replace = 'html_root_url = "https://docs.rs/zbus-lockstep-macros/{{version}}"'
 exact = true
 
+# 1. Updates all 3 occurrences in the root README.md:
+[[workspace.metadata.release.pre-release-replacements]]
+file = "README.md"
+search = 'zbus-lockstep = { version = "{{prev_version}}"'
+replace = 'zbus-lockstep = { version = "{{version}}"'
+exact = true
+
+# 2. Updates the zbus-lockstep crate README:
 [[workspace.metadata.release.pre-release-replacements]]
 file = "zbus-lockstep/README.md"
 search = 'zbus-lockstep = "{{prev_version}}"'
 replace = 'zbus-lockstep = "{{version}}"'
 exact = true
 
-[[workspace.metadata.release.pre-release-replacements]]
-file = "zbus-lockstep/README.md"
-search = 'zb-lsm = { package = "zbus-lockstep-macros", version = "{{prev_version}}" }'
-replace = 'zb-lsm = { package = "zbus-lockstep-macros", version = "{{version}}" }'
-exact = true
-
+# 3. Updates the zbus-lockstep-macros crate README:
 [[workspace.metadata.release.pre-release-replacements]]
 file = "zbus-lockstep-macros/README.md"
 search = 'zbus-lockstep-macros = "{{prev_version}}"'
