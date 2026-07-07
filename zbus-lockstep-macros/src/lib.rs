@@ -38,7 +38,10 @@ use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Tok
 ///
 /// Use the `xml` argument:
 ///
-/// ```ignore
+/// ```rust
+/// use zbus_lockstep_macros::validate;
+/// use zvariant::{OwnedObjectPath, Type};
+///
 /// #[validate(xml: "xml")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
@@ -56,7 +59,10 @@ use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Tok
 /// If more than one signal with the same name is defined in the XML file(s),
 /// the macro will fail and you can provide an interface name to disambiguate.
 ///
-/// ```ignore
+/// ```rust
+/// use zbus_lockstep_macros::validate;
+/// use zvariant::{OwnedObjectPath, Type};
+///
 /// #[validate(interface: "org.example.Node")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
@@ -70,7 +76,10 @@ use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Tok
 ///
 /// If a custom signal name is desired, you can be provided using `signal:`.
 ///
-/// ```ignore
+/// ```rust
+/// use zbus_lockstep_macros::validate;
+/// use zvariant::{OwnedObjectPath, Type};
+///
 /// #[validate(signal: "RemoveNode")]
 /// #[derive(Type)]
 /// struct RemoveNodeSignal {
