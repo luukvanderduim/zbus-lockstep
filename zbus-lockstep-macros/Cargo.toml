@@ -2,7 +2,7 @@
 name = "zbus-lockstep-macros"
 authors = ["Luuk van der Duim <luukvanderduim@gmail.com>"]
 description = "Macros to keep types in lockstep with DBus XML definitions"
-version = "0.5.2"
+version = "0.6.0"
 edition =  { workspace = true }
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 documentation = "https://docs.rs/zbus-lockstep-macro"

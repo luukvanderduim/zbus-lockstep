@@ -45,7 +45,7 @@ Add the `zbus-lockstep` crate to your `Cargo.toml` with the `macros` feature ena
 
 ```toml
 [dev-dependencies]
-zbus-lockstep = { version = "0.5.2", features = ["macros"] }
+zbus-lockstep = { version = "0.6.0", features = ["macros"] }
 ```
 
 or, from your shell:
@@ -123,7 +123,7 @@ See either crate and their docs for more details on usage and options.
 
 ```toml
 [dependencies]
-zbus-lockstep = { version = "0.5.2", features = ["macros"] }
+zbus-lockstep = { version = "0.6.0", features = ["macros"] }
 ```
 
 ## Test-gating `validate` 
@@ -149,7 +149,7 @@ users can safely move the dependency into `[dev-dependencies]`.
 
 ```toml
 [dev-dependencies]
-zbus-lockstep = { version = "0.5.2", features = ["macros"] }
+zbus-lockstep = { version = "0.6.0", features = ["macros"] }
 ```
 
 See this in action in [the minimal end-use example.](https://github.com/luukvanderduim/zbus-lockstep/tree/main/e2e/lockstep_user)
