@@ -10,3 +10,6 @@ zvariant = { workspace = true }
 
 [dev-dependencies]
 zbus-lockstep = { path = "../../zbus-lockstep", features = ["macros"] }
+
+[package.metadata.release]
+release = false

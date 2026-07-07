@@ -87,3 +87,7 @@ tag_pattern = "v[0-9].*"
 topo_order = false
 # sort the commits inside sections by oldest/newest order
 sort_commits = "oldest"
+
+[remote.github]
+owner = "luukvanderduim"
+repo = "zbus-lockstep"
