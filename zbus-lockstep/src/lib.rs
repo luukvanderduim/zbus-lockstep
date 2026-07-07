@@ -27,6 +27,8 @@ use std::{io::Read, str::FromStr};
 
 pub use error::LockstepError;
 pub use macros::resolve_xml_path;
+#[cfg(feature = "macros")]
+pub use zbus_lockstep_macros::validate;
 pub use zbus_xml::{
     self,
     ArgDirection::{In, Out},

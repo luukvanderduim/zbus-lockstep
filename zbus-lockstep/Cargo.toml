@@ -18,11 +18,13 @@ publish = true
 [badges.maintenance]
 status = "actively-developed"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+macros = ["dep:zbus-lockstep-macros"]
 
 [dependencies]
 zbus_xml = { workspace = true }
 zvariant = { workspace = true }
+zbus-lockstep-macros = { path = "../zbus-lockstep-macros", version = "0.5.2", optional = true }
 
 [dev-dependencies]
 tempfile = "3.27.0"

@@ -13,6 +13,9 @@ edition = "2021"
 zbus_xml = { version = "5.2.0" }
 zvariant = { version = "5.1" }
 
+[patch.crates-io]
+zbus_xml = { git = "https://github.com/z-galaxy/zbus/" }
+zvariant = { git = "https://github.com/z-galaxy/zbus/" }
 
 
 # Metadata below is read by `cargo-release`.
