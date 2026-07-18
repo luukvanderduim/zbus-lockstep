@@ -25,6 +25,7 @@ mod macros;
 
 use std::{io::Read, str::FromStr};
 
+use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, PropertyNotFound};
 pub use error::LockstepError;
 pub use macros::resolve_xml_path;
 #[cfg(feature = "macros")]
@@ -33,7 +34,6 @@ pub use zbus_lockstep_macros::validate;
 pub use zbus_xml;
 use zbus_xml::ArgDirection::{In, Out};
 use zvariant::Signature;
-use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, PropertyNotFound};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 

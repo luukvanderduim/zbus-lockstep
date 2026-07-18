@@ -6,13 +6,14 @@ authors = [
 ]
 description = "Keep types in lockstep with DBus XML definitions"
 version = "0.6.0"
-edition =  { workspace = true }
+edition.workspace = true
 keywords = ["type-safety", "zbus", "DBus", "IPC"]
 documentation = "https://docs.rs/zbus-lockstep"
 repository = "https://github.com/luukvanderduim/zbus-lockstep"
 readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "LICENSE-MIT", "README.md"]
+rust-version.workspace = true
 publish = true
 
 [badges.maintenance]

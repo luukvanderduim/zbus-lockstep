@@ -78,7 +78,10 @@ definitions is known - can retrieve signatures more succinctly.
 ```rust
 #[test]
 fn macro_retrieve_signal_body_remove_node() {
-std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
+// You can set `LOCKSTEP_XML_PATH` to the path of the XML definitions before running the test.
+// 
+// Be aware that setting with `std::env::set_var` is unsafe and may lead to unexpected failures:
+// See: https://doc.rust-lang.org/stable/std/env/fn.set_var.html#safety
 use zbus_lockstep;
 
 let sig = signal_body_type_signature!("RemoveNode");

@@ -21,8 +21,6 @@ use crate::Result;
 /// # use zbus_lockstep::resolve_xml_path;
 /// # use std::path::PathBuf;
 /// # fn main() {
-/// // path to XML files
-/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 ///
 /// let xml_path = resolve_xml_path(None).unwrap_or_else(|e| panic!("Failed to resolve XML path: {e}"));
 /// assert_eq!(xml_path, PathBuf::from("../xml").canonicalize().unwrap());
@@ -186,8 +184,6 @@ macro_rules! find_definition_in_dbus_xml {
 /// use zbus_lockstep::method_return_signature;
 /// use zvariant::Signature;
 ///
-/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("u").expect("Valid signature pattern"));
 /// ```
@@ -196,7 +192,6 @@ macro_rules! find_definition_in_dbus_xml {
 ///
 /// ```rust
 /// # use zbus_lockstep::{method_return_signature};
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 /// let _sig = method_return_signature!("RequestName", "org.example.Node", "grape");
 ///
 /// // or alternatively
@@ -297,8 +292,6 @@ macro_rules! method_return_signature {
 /// use zbus_lockstep::method_args_signature;
 /// use zvariant::Signature;
 ///
-/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///
 /// let sig = method_args_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("(su)").expect("Valid signature pattern"));
 /// ```
@@ -307,7 +300,6 @@ macro_rules! method_return_signature {
 ///
 /// ```rust
 /// # use zbus_lockstep::{method_args_signature};
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 /// let _sig = method_args_signature!("RequestName", "org.example.Node", "apple");
 ///
 /// // or alternatively
@@ -404,8 +396,6 @@ macro_rules! method_args_signature {
 /// use zbus_lockstep::signal_body_type_signature;
 /// use zvariant::Signature;
 ///
-/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///
 /// let sig = signal_body_type_signature!("AddNode");
 /// assert_eq!(&sig, &Signature::from_str("(so)").expect("Valid signature pattern"));
 /// ```
@@ -414,7 +404,6 @@ macro_rules! method_args_signature {
 ///
 /// ```rust
 /// # use zbus_lockstep::{signal_body_type_signature};
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 /// let _sig = signal_body_type_signature!("Alert", "org.example.Node", "color");
 ///
 /// // or alternatively
@@ -512,8 +501,6 @@ macro_rules! signal_body_type_signature {
 /// use zbus_lockstep::property_type_signature;
 /// use zvariant::Signature;
 ///
-/// std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-///
 /// let sig = property_type_signature!("Features");
 /// assert_eq!(&sig, &Signature::from_str("as").expect("Valid signature pattern"));
 /// ```
@@ -521,7 +508,6 @@ macro_rules! signal_body_type_signature {
 ///
 /// ```rust
 /// # use zbus_lockstep::{property_type_signature};
-/// # std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
 /// let _sig = property_type_signature!(member: "Features", interface: "org.example.Node");
 /// ```
 #[macro_export]
@@ -581,9 +567,11 @@ mod test {
 
     #[test]
     fn test_signal_body_signature_macro() {
-        // path to XML files can be set by environment variable
-        // std::env::set_var("LOCKSTEP_XML_PATH", "../xml");
-        // But `resolve_xml_path` can find the `xml` in parent by itself.
+        // Path to XML files can be set by setting environment variable `LOCKSTEP_XML_PATH`
+        // However, `resolve_xml_path` can find the `xml` in parent.
+        //
+        // Note that setting the environment variable with std::env::set_var is not recommended:
+        // https://doc.rust-lang.org/stable/std/env/fn.set_var.html#safety
 
         let sig = crate::signal_body_type_signature!("AddNode");
         assert_eq!(
