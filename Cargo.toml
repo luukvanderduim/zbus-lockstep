@@ -21,9 +21,6 @@ zvariant = { version = "5.1", default-features = false }
 # Only allow releasing from the main branch
 allow-branch = ["main"]
 
-# The hook that automatically runs git-cliff to prepend the new version to CHANGELOG.md before committing
-pre-release-hook = ["git-cliff", "--config", "../cliff.toml", "--unreleased", "--tag", "v{{version}}", "--prepend", "../CHANGELOG.md"]
-
 # Template for the git commit message
 pre-release-commit-message = "chore(release): prepare for v{{version}}"
 

@@ -31,6 +31,10 @@ tempfile = "3.27.0"
 version-sync = "0.9.5"
 
 
+[package.metadata.release]
+# Run git-cliff once during the release of the main crate:
+pre-release-hook = ["git-cliff", "--config", "../cliff.toml", "--unreleased", "--tag", "v{{version}}", "--prepend", "../CHANGELOG.md"]
+
 [[package.metadata.release.pre-release-replacements]]
 file = "src/lib.rs"
 search = 'html_root_url = "https://docs.rs/zbus-lockstep/[0-9.]+"'
