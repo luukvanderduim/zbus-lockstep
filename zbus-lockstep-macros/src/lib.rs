@@ -324,7 +324,7 @@ impl syn::parse::Parse for ValidateArgs {
                     return Err(syn::Error::new(
                         ident.span(),
                         format!("Unexpected argument: {ident}"),
-                    ))
+                    ));
                 }
             }
 
