@@ -5,31 +5,39 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+
 jobs:
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
     steps:
+      # actions/checkout@v4.2.2
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          fetch-depth: 0 # Fetch all history so git-cliff can generate the changelog
+          fetch-depth: 0
+          persist-credentials: false
 
-      # Installeer de kant-en-klare binary (veilig en Docker-vrij!)
+      # taiki-e/install-action@v2.83.4
       - name: Install git-cliff
-        uses: taiki-e/install-action@git-cliff
+        uses: taiki-e/install-action@07b4745e0c39a41822af610387492e3e53aa222b
+        with:
+          tool: git-cliff
 
-      # Genereer de changelog via het normale commando:
+      # Genereer de changelog
       - name: Generate Changelog
         run: git-cliff --config cliff.toml --latest --strip header -o NEW_CHANGELOG.md
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: NEW_CHANGELOG.md
-          draft: false
-          prerelease: false
+        run: |
+          gh release create "$TAG_NAME" \
+            --title "zbus-lockstep $TAG_NAME" \
+            --notes-file NEW_CHANGELOG.md
         env:
+          TAG_NAME: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
