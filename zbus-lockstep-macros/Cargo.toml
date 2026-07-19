@@ -25,7 +25,7 @@ zbus_xml = { workspace = true }
 zvariant = { workspace = true }
 
 [dev-dependencies]
-version-sync = "0.9"
+version-sync = { workspace = true }
 zbus-lockstep = { path = "../zbus-lockstep" }
 
 

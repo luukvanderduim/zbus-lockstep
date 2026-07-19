@@ -12,7 +12,9 @@ rust-version = "1.87.0"
 
 [workspace.dependencies]
 zbus_xml = { version = "5.2.0" }
-zvariant = { version = "5.1", default-features = false }
+zvariant = { version = "5.13.0", default-features = false }
+# shared dev-dependencies are dependencies in the workspace
+version-sync = "0.9.5"
 
 
 # Metadata below is read by `cargo-release`.
