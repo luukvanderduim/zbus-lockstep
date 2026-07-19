@@ -9,7 +9,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse::ParseStream, parse_macro_input, DeriveInput, Ident, LitStr, Token};
+use syn::{DeriveInput, Ident, LitStr, Token, parse::ParseStream, parse_macro_input};
 
 /// Validate a struct's type signature against XML signal body type.
 ///
