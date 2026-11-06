@@ -22,7 +22,7 @@ syn = "2.0.64"
 proc-macro2 = "1.0.81"
 quote = "1.0.36"
 zbus_xml = { workspace = true }
-zvariant = { workspace = true }
+zbus = { workspace = true }
 
 [dev-dependencies]
 version-sync = { workspace = true }

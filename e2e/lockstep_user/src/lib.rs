@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use zvariant::Type;
+use zbus::Type;
 
 #[cfg_attr(test, zbus_lockstep::validate(xml: "xml"))]
 #[derive(Type)]

@@ -15,8 +15,8 @@ edition = "2024"
 rust-version = "1.87.0"
 
 [workspace.dependencies]
-zbus_xml = { version = "5.2.0" }
-zvariant = { version = "5.13.0", default-features = false }
+zbus     = { version = "6.0", default-features = false }
+zbus_xml = { version = "6.0" }
 # shared dev-dependencies are dependencies in the workspace
 version-sync = "0.9.5"
 

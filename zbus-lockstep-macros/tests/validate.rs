@@ -1,8 +1,8 @@
 // tests/attribute_macro.rs
 #![allow(unnameable_test_items)]
 
+use zbus::{OwnedObjectPath, Type};
 use zbus_lockstep_macros::validate;
-use zvariant::{OwnedObjectPath, Type};
 
 #[test]
 fn test_validate_enum() {

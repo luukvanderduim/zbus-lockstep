@@ -40,7 +40,7 @@ use syn::{DeriveInput, Ident, LitStr, Token, parse::ParseStream, parse_macro_inp
 ///
 /// ```rust
 /// use zbus_lockstep_macros::validate;
-/// use zvariant::{OwnedObjectPath, Type};
+/// use zbus::{OwnedObjectPath, Type};
 ///
 /// #[validate(xml: "xml")]
 /// #[derive(Type)]
@@ -61,7 +61,7 @@ use syn::{DeriveInput, Ident, LitStr, Token, parse::ParseStream, parse_macro_inp
 ///
 /// ```rust
 /// use zbus_lockstep_macros::validate;
-/// use zvariant::{OwnedObjectPath, Type};
+/// use zbus::{OwnedObjectPath, Type};
 ///
 /// #[validate(interface: "org.example.Node")]
 /// #[derive(Type)]
@@ -78,7 +78,7 @@ use syn::{DeriveInput, Ident, LitStr, Token, parse::ParseStream, parse_macro_inp
 ///
 /// ```rust
 /// use zbus_lockstep_macros::validate;
-/// use zvariant::{OwnedObjectPath, Type};
+/// use zbus::{OwnedObjectPath, Type};
 ///
 /// #[validate(signal: "RemoveNode")]
 /// #[derive(Type)]
@@ -95,9 +95,9 @@ use syn::{DeriveInput, Ident, LitStr, Token, parse::ParseStream, parse_macro_inp
 /// # Examples
 ///
 /// ```rust
-/// use zvariant::OwnedObjectPath;
+/// use zbus::OwnedObjectPath;
 /// use zbus_lockstep_macros::validate;
-/// use zvariant::Type;
+/// use zbus::Type;
 ///
 /// #[validate(xml: "xml", interface: "org.example.Node", signal: "RemoveNode")]
 /// #[derive(Type)]
@@ -267,7 +267,7 @@ pub fn validate(args: TokenStream, input: TokenStream) -> TokenStream {
         #[cfg(test)]
         #[test]
         fn #test_name() {
-            use zvariant::Type;
+            use zbus::Type;
 
             let xml_file = std::fs::File::open(#xml_file_path).expect("\"#xml_file_path\" expected to be a valid file path." );
             let item_signature_from_xml = zbus_lockstep::get_signal_body_type(

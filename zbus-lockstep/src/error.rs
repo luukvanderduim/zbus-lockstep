@@ -12,7 +12,7 @@ pub enum LockstepError {
     Fmt(std::fmt::Error),
     Io(std::io::Error),
     Xml(zbus_xml::Error),
-    Zvariant(zvariant::Error),
+    Zbus(zbus::Error),
 }
 
 impl std::error::Error for LockstepError {
@@ -22,7 +22,7 @@ impl std::error::Error for LockstepError {
             LockstepError::Fmt(e) => Some(e),
             LockstepError::Io(e) => Some(e),
             LockstepError::Xml(e) => Some(e),
-            LockstepError::Zvariant(e) => Some(e),
+            LockstepError::Zbus(e) => Some(e),
             _ => None,
         }
     }
@@ -44,7 +44,7 @@ impl std::fmt::Display for LockstepError {
             LockstepError::Fmt(e) => write!(f, "Formatting error: {e}"),
             LockstepError::Io(e) => write!(f, "IO error: {e}"),
             LockstepError::Xml(e) => write!(f, "XML error: {e}"),
-            LockstepError::Zvariant(e) => write!(f, "Zvariant signature error: {e}"),
+            LockstepError::Zbus(e) => write!(f, "Zbus signature error: {e}"),
         }
     }
 }
@@ -61,16 +61,15 @@ impl From<zbus_xml::Error> for LockstepError {
     }
 }
 
-impl From<zvariant::Error> for LockstepError {
-    fn from(e: zvariant::Error) -> Self {
-        LockstepError::Zvariant(e)
+impl From<zbus::Error> for LockstepError {
+    fn from(e: zbus::Error) -> Self {
+        LockstepError::Zbus(e)
     }
 }
 
-impl From<zvariant::signature::Error> for LockstepError {
-    fn from(e: zvariant::signature::Error) -> Self {
-        // Under-the-hood `zvariant` converts this to `zvariant::Error::SignatureParse(e)`
-        LockstepError::Zvariant(zvariant::Error::from(e))
+impl From<zbus::wire::signature::Error> for LockstepError {
+    fn from(e: zbus::wire::signature::Error) -> Self {
+        LockstepError::Zbus(zbus::Error::SignatureParse(e))
     }
 }
 

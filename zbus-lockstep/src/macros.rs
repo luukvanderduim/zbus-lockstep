@@ -174,7 +174,7 @@ macro_rules! find_definition_in_dbus_xml {
 /// ```rust
 /// use std::str::FromStr;
 /// use zbus_lockstep::method_return_signature;
-/// use zvariant::Signature;
+/// use zbus::Signature;
 ///
 /// let sig = method_return_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("u").expect("Valid signature pattern"));
@@ -282,7 +282,7 @@ macro_rules! method_return_signature {
 /// ```rust
 /// use std::str::FromStr;
 /// use zbus_lockstep::method_args_signature;
-/// use zvariant::Signature;
+/// use zbus::Signature;
 ///
 /// let sig = method_args_signature!("RequestName");
 /// assert_eq!(&sig, &Signature::from_str("(su)").expect("Valid signature pattern"));
@@ -386,7 +386,7 @@ macro_rules! method_args_signature {
 /// ```rust
 /// use std::str::FromStr;
 /// use zbus_lockstep::signal_body_type_signature;
-/// use zvariant::Signature;
+/// use zbus::Signature;
 ///
 /// let sig = signal_body_type_signature!("AddNode");
 /// assert_eq!(&sig, &Signature::from_str("(so)").expect("Valid signature pattern"));
@@ -491,7 +491,7 @@ macro_rules! signal_body_type_signature {
 /// ```rust
 /// use std::str::FromStr;
 /// use zbus_lockstep::property_type_signature;
-/// use zvariant::Signature;
+/// use zbus::Signature;
 ///
 /// let sig = property_type_signature!("Features");
 /// assert_eq!(&sig, &Signature::from_str("as").expect("Valid signature pattern"));
@@ -553,7 +553,7 @@ macro_rules! property_type_signature {
 mod test {
     use std::str::FromStr;
 
-    use zvariant::Signature;
+    use zbus::Signature;
 
     use crate::signal_body_type_signature;
 
@@ -568,7 +568,7 @@ mod test {
         let sig = crate::signal_body_type_signature!("AddNode");
         assert_eq!(
             &sig,
-            &zvariant::Signature::from_str("(so)").expect("Valid signature pattern")
+            &zbus::Signature::from_str("(so)").expect("Valid signature pattern")
         );
     }
 

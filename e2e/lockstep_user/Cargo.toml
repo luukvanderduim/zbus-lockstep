@@ -6,7 +6,7 @@ edition =  { workspace = true }
 publish = false
 
 [dependencies]
-zvariant = { workspace = true }
+zbus = { workspace = true }
 
 [dev-dependencies]
 zbus-lockstep = { path = "../../zbus-lockstep", features = ["macros"] }

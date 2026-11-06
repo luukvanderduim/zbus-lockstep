@@ -28,12 +28,12 @@ use std::{fmt::Write, io::Read, str::FromStr};
 use LockstepError::{ArgumentNotFound, InterfaceNotFound, MemberNotFound, PropertyNotFound};
 pub use error::LockstepError;
 pub use macros::resolve_xml_path;
+use zbus::Signature;
 #[cfg(feature = "macros")]
 pub use zbus_lockstep_macros::validate;
 #[doc(hidden)]
 pub use zbus_xml;
 use zbus_xml::ArgDirection::{In, Out};
-use zvariant::Signature;
 
 type Result<T> = std::result::Result<T, LockstepError>;
 
@@ -55,7 +55,7 @@ pub enum MsgType {
 /// # use std::fs::File;
 /// # use std::io::{Seek, SeekFrom, Write};
 /// # use tempfile::tempfile;
-/// use zvariant::{Signature, Type, OwnedObjectPath};
+/// use zbus::{Signature, Type, OwnedObjectPath};
 /// use zbus_lockstep::get_signal_body_type;
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
@@ -99,9 +99,8 @@ pub fn get_signal_body_type(
         .find(|iface| iface.name() == interface_name)
         .ok_or(InterfaceNotFound(interface_name.to_owned()))?;
 
-    let signals = interface.signals();
-    let signal = signals
-        .iter()
+    let signal = interface
+        .signals()
         .find(|signal| signal.name() == member_name)
         .ok_or(MemberNotFound(member_name.to_owned()))?;
 
@@ -113,12 +112,11 @@ pub fn get_signal_body_type(
                 .find(|signal_arg| signal_arg.name() == Some(needle_arg_name))
                 .ok_or(ArgumentNotFound(needle_arg_name.to_owned()))?
                 .ty()
-                .inner()
                 .clone()
         } else {
             let mut combined_sig = String::new();
             for signal_arg in signal.args() {
-                write!(combined_sig, "{}", signal_arg.ty().inner())?;
+                write!(combined_sig, "{}", signal_arg.ty())?;
             }
             Signature::from_str(&combined_sig)?
         }
@@ -135,7 +133,7 @@ pub fn get_signal_body_type(
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zvariant::Type;
+/// use zbus::Type;
 /// use zbus_lockstep::get_property_type;
 ///
 /// #[derive(Debug, PartialEq, Type)]
@@ -172,9 +170,8 @@ pub fn get_property_type(
         .find(|iface| iface.name() == interface_name)
         .ok_or(InterfaceNotFound(interface_name.to_string()))?;
 
-    let properties = interface.properties();
-    let property = properties
-        .iter()
+    let property = interface
+        .properties()
         .find(|property| property.name() == property_name)
         .ok_or(PropertyNotFound(property_name.to_owned()))?;
 
@@ -194,7 +191,7 @@ pub fn get_property_type(
 /// use std::fs::File;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zvariant::Type;
+/// use zbus::Type;
 /// use zbus_lockstep::get_method_return_type;
 ///
 /// #[derive(Debug, PartialEq, Type)]
@@ -245,9 +242,8 @@ pub fn get_method_return_type(
         .find(|iface| iface.name() == interface_name)
         .ok_or(InterfaceNotFound(interface_name.to_string()))?;
 
-    let methods = interface.methods();
-    let method = methods
-        .iter()
+    let method = interface
+        .methods()
         .find(|method| method.name() == member_name)
         .ok_or(MemberNotFound(member_name.to_string()))?;
 
@@ -259,12 +255,11 @@ pub fn get_method_return_type(
                 .find(|arg| arg.name() == Some(needle_arg_name) && arg.direction() == Some(Out))
                 .ok_or(ArgumentNotFound(needle_arg_name.to_string()))?
                 .ty()
-                .inner()
                 .clone()
         } else {
             let mut combined_sig = String::new();
             for arg in args.iter().filter(|arg| arg.direction() == Some(Out)) {
-                write!(combined_sig, "{}", arg.ty().inner())?;
+                write!(combined_sig, "{}", arg.ty())?;
             }
             Signature::from_str(&combined_sig)?
         }
@@ -288,7 +283,7 @@ pub fn get_method_return_type(
 /// use std::collections::HashMap;
 /// use std::io::{Seek, SeekFrom, Write};
 /// use tempfile::tempfile;
-/// use zvariant::{Type, Value};
+/// use zbus::{Type, Variant};
 /// use zbus_lockstep::get_method_args_type;
 ///
 /// let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
@@ -317,7 +312,7 @@ pub fn get_method_return_type(
 ///    summary: String,
 ///    body: String,
 ///    actions: Vec<String>,
-///    hints: HashMap<String, Value<'a>>,
+///    hints: HashMap<String, Variant<'a>>,  
 ///    expire_timeout: i32,
 /// }
 ///
@@ -349,9 +344,8 @@ pub fn get_method_args_type(
         .find(|iface| iface.name() == interface_name)
         .ok_or(InterfaceNotFound(interface_name.to_owned()))?;
 
-    let methods = interface.methods();
-    let method = methods
-        .iter()
+    let method = interface
+        .methods()
         .find(|method| method.name() == member_name)
         .ok_or(MemberNotFound(member_name.to_owned()))?;
 
@@ -364,12 +358,11 @@ pub fn get_method_args_type(
             })
             .ok_or(ArgumentNotFound(needle_arg_name.to_string()))?
             .ty()
-            .inner()
             .clone()
     } else {
         let mut combined_sig = String::new();
         for arg in args.iter().filter(|arg| arg.direction() == Some(In)) {
-            write!(combined_sig, "{}", arg.ty().inner())?;
+            write!(combined_sig, "{}", arg.ty())?;
         }
         Signature::from_str(&combined_sig)?
     };
@@ -382,7 +375,7 @@ mod test {
     use std::io::{Seek, SeekFrom, Write};
 
     use tempfile::tempfile;
-    use zvariant::{OwnedObjectPath, Type};
+    use zbus::{OwnedObjectPath, Type};
 
     use crate::{get_method_args_type, get_method_return_type, get_signal_body_type};
 
