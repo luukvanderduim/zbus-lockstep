@@ -50,9 +50,10 @@ commit_preprocessors = [
 ]
 # regex for parsing and grouping commits
 commit_parsers = [
+  { message = '(?i)^(?:\S+\s+)?(config|logs)\b', skip = true },
+
   # NOTE: first match wins — keep the narrow skip rules above the broad ones.
   # `(?:\S+\s+)?` tolerates a leading emoji token, `(?i)` ignores case.
-
   { message = '(?i)^(?:\S+\s+)?chore\((release|deps|pr|pull)', skip = true },
 
   { message = '💥|^:boom:', group = "<!-- 2 -->💥 Breaking change" },
