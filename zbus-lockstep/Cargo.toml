@@ -38,7 +38,7 @@ version-sync = { workspace = true }
 pre-release-hook = [
   "sh",
   "-c",
-  'if [ "$DRY_RUN" = "true" ]; then git-cliff --config ../cliff.toml --unreleased --tag v{{version}}; else git-cliff --config ../cliff.toml --unreleased --tag v{{version}} --prepend ../CHANGELOG.md; fi',
+  'cd .. && if [ "$DRY_RUN" = "true" ]; then git-cliff --config cliff.toml --unreleased --tag v{{version}}; else git-cliff --config cliff.toml --unreleased --tag v{{version}} --prepend CHANGELOG.md; fi',
 ]
 
 [[package.metadata.release.pre-release-replacements]]
