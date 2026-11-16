@@ -33,8 +33,13 @@ version-sync = { workspace = true }
 
 
 [package.metadata.release]
-# Run git-cliff once during the release of the main crate:
-pre-release-hook = ["git-cliff", "--config", "../cliff.toml", "--unreleased", "--tag", "v{{version}}", "--prepend", "../CHANGELOG.md"]
+# Run git-cliff once during the release of the main crate.
+# During a dry run we only print, so a dry run never touches CHANGELOG.md.
+pre-release-hook = [
+  "sh",
+  "-c",
+  'if [ "$DRY_RUN" = "true" ]; then git-cliff --config ../cliff.toml --unreleased --tag v{{version}}; else git-cliff --config ../cliff.toml --unreleased --tag v{{version}} --prepend ../CHANGELOG.md; fi',
+]
 
 [[package.metadata.release.pre-release-replacements]]
 file = "src/lib.rs"
