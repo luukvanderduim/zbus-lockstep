@@ -45,3 +45,24 @@ jobs:
         uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Do not allow the toml files to lie about minimally required versions.
+  # Fail if the manifests overstate what we support
+  minimal_versions:
+    name: Minimal Versions
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout@v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      # Uses the pre-installed rustup, so no extra third-party action has to be pinned.
+      - name: Install nightly toolchain
+        run: rustup toolchain install nightly --profile minimal
+
+      - name: Resolve direct dependencies to their minimum versions
+        run: cargo +nightly generate-lockfile -Zdirect-minimal-versions
+
+      - name: Check the graph against those minimums
+        run: cargo +nightly check --workspace --all-targets
