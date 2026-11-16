@@ -18,8 +18,8 @@ publish = true
 proc-macro = true
 
 [dependencies]
-syn = "2.0.64"
-proc-macro2 = "1.0.81"
+syn = "3.0"
+proc-macro2 = "1.0.91"
 quote = "1.0.36"
 zbus_xml = { workspace = true }
 zbus = { workspace = true }
