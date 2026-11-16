@@ -77,6 +77,10 @@ commit_parsers = [
   { message = '(?i)^(?:\S+\s+)?iphone|^🧑‍💻|^:technologist:', group = "<!-- 17 -->🧑‍💻 Improve DX" },
   { message = '(?i)^(?:\S+\s+)?triangular_flag_on_post|^🚩|^:triangular_flag_on_post:', group = "<!-- 18 -->🚩 Feature flags" },
   { message = '(?i)^(?:\S+\s+)?thread|^🧵|^:thread:', group = "<!-- 19 -->🧵 Multithreading / Concurrency" },
+
+  # Safety net: a commit that matched nothing used to vanish from the changelog,
+  # because the body template's `group_by` skips items without a `group`.
+  { message = '.*', group = "<!-- 20 -->🔖 Other" },
 ]
 
 # protect breaking changes from being skipped due to matching a skipping commit_parser
