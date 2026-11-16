@@ -26,7 +26,7 @@ Add `zbus-lockstep` to `Cargo.toml`'s dev-dependencies:
 
 ```toml
 [dev-dependencies]
-zbus-lockstep = "0.7.0"
+zbus-lockstep = "0.8.0"
 ```
 
 Consider the followwing XML description, an interface with a single signal.

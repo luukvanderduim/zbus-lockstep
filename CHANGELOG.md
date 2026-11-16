@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-11-16
+
+### ⬆️ Dependencies
+
+- Update `zbus` to 6.x ([#10](https://github.com/luukvanderduim/zbus-lockstep/pull/10)) ([579106b](https://github.com/luukvanderduim/zbus-lockstep/commit/579106b49b3ba5f95562c1460c4e7a76f0d8cd4f))
+- ⬆️ deps(all): upgrade dependencies ([f715290](https://github.com/luukvanderduim/zbus-lockstep/commit/f71529058830f52f451a683ac814a5e90e9261a4))
+
+### ♻️ Refactor / Move files
+
+- Refactor (all)🔥: drop dead `CARGO_PKG_NAME` XML dir candidates ([8a19b25](https://github.com/luukvanderduim/zbus-lockstep/commit/8a19b251dbb3411f19bea878218b64a0f5e61407))
+- 🔧 refactor: accept icons and keywords in all orders ([2a8726c](https://github.com/luukvanderduim/zbus-lockstep/commit/2a8726cf9846656a9d750cfa0f1f0cc85d9b493d))
+
+### ⚙️ Miscellaneous Tasks
+
+- 💡 chore: remove accidental Dutch ([0ff2d85](https://github.com/luukvanderduim/zbus-lockstep/commit/0ff2d85379aa058ca151541e0ef9870582649754))
+- 👷 build: fail on overstating manifest ([e97a5b8](https://github.com/luukvanderduim/zbus-lockstep/commit/e97a5b884ed636ef89afd1732dcc7e84cb424855))
+- 👷 build(all): regenerate lockfile ([e4ba4cc](https://github.com/luukvanderduim/zbus-lockstep/commit/e4ba4cc8575ce57598777169b62e1b3087ae3b24))
+- 🔧 chore: update config files ([712a528](https://github.com/luukvanderduim/zbus-lockstep/commit/712a528c696a5e34157ddbb9107d523cf8bc6623))
+
 ## [0.7.0] - 2026-07-27
 
 ### 🐛 Fixes
