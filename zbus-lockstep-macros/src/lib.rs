@@ -347,7 +347,7 @@ impl syn::parse::Parse for ValidateArgs {
 ///
 /// 1. Environment variable (`LOCKSTEP_XML_PATH`) overrides everything.
 /// 2. Provided argument (if `Some`) overrides the default location.
-/// 3. Default location fallbacks (only searched if 1 and 2 are not set).
+/// 3. Default location fallback (only searched if 1 and 2 are not set).
 fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     if let Ok(env_path) = std::env::var("LOCKSTEP_XML_PATH") {
         let xml_path = PathBuf::from(env_path);
@@ -378,7 +378,6 @@ fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
     }
 
     // Try fallback paths:
-
     let current_dir = std::env::var("CARGO_MANIFEST_DIR")
         .map(PathBuf::from)
         .map_err(|e| {
@@ -388,16 +387,11 @@ fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
             )
         })?;
 
-    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
-
-    // Definieer de standaardpaden die we willen proberen:
     let paths_to_try = [
-        current_dir.join("xml"),                   // ./xml
-        current_dir.join("XML"),                   // ./XML
-        current_dir.join("../xml"),                // ../xml
-        current_dir.join("../XML"),                // ../XML
-        current_dir.join(&crate_name).join("xml"), // ./<crate_name>/xml
-        current_dir.join(&crate_name).join("XML"), // ./<crate_name>/XML
+        current_dir.join("xml"),    // ./xml
+        current_dir.join("XML"),    // ./XML
+        current_dir.join("../xml"), // ../xml
+        current_dir.join("../XML"), // ../XML
     ];
 
     for path in paths_to_try {

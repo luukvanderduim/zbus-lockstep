@@ -12,8 +12,7 @@ use crate::{LockstepError, Result};
 ///
 /// 1. Environment variable (`LOCKSTEP_XML_PATH`)
 /// 2. Provided argument
-/// 3. Default location (`xml/`, `XML/`, `../xml` or `../XML` or `<crate_name>/xml` or
-///    `<crate_name>/XML`)
+/// 3. Default locations (`xml/`, `XML/`, `../xml` or `../XML`)
 ///
 /// # Example
 ///
@@ -39,15 +38,12 @@ pub fn resolve_xml_path(xml: Option<&str>) -> Result<PathBuf> {
 
     // Fallback to the default paths:
     let current_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR")?);
-    let crate_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| String::from("unknown"));
 
     let paths_to_try = [
         current_dir.join("xml"),
         current_dir.join("XML"),
         current_dir.join("../xml"),
         current_dir.join("../XML"),
-        current_dir.join(&crate_name).join("xml"),
-        current_dir.join(&crate_name).join("XML"),
     ];
 
     for path in paths_to_try {
