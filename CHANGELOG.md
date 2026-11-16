@@ -24,28 +24,6 @@ All notable changes to this project will be documented in this file.
 
 - ✅ test: Add tests to demonstrate equal name args bug ([2d78faf](https://github.com/luukvanderduim/zbus-lockstep/commit/2d78faf62e96a81617283271e760e8f30d136497))
 
-## [0.7.0] - 2026-07-27
-
-### 🐛 Fixes
-
-- 🐛 fix: Colliding args names distinguishable by direction ([8306c5a](https://github.com/luukvanderduim/zbus-lockstep/commit/8306c5a4ff06f320b4007c08a560c93b7f8dbdf6))
-
-### 📝 Documentation
-
-- 📝 docs: fix intra-doc links ([8da2335](https://github.com/luukvanderduim/zbus-lockstep/commit/8da2335ef1583cc1a71a5102f300a88d1c3a66f8))
-
-### ♻️ Refactor / Move files
-
-- ♻️ refactor: Adjust `resolve_xml_path` to concrete erros ([0d12452](https://github.com/luukvanderduim/zbus-lockstep/commit/0d12452631306b1dc94a9b3adabd538b44cdeadb))
-- ♻️ refactor!: `Result` alias contains concrete `Error` type ([27d1a54](https://github.com/luukvanderduim/zbus-lockstep/commit/27d1a542456e519941c279ea972c2195bb9744fc))
-- ♻️ refactor: Always return concrete `LockstepError` from functions. ([2ca38af](https://github.com/luukvanderduim/zbus-lockstep/commit/2ca38af17168b64945a64fa83d39100774c0bda0))
-- ♻️ refactor!: Name `arg_name` argument equally across `fn`s ([ff05116](https://github.com/luukvanderduim/zbus-lockstep/commit/ff051161a901dd936ea315eb40993aacaf365415))
-- ♻️ refactor: Avoid allocations / double conversions ([75eb77b](https://github.com/luukvanderduim/zbus-lockstep/commit/75eb77b476005ed849233debaa45d45708ac42ea))
-
-### ✅ Testing and validation
-
-- ✅ test: Add tests to demonstrate equal name args bug ([2d78faf](https://github.com/luukvanderduim/zbus-lockstep/commit/2d78faf62e96a81617283271e760e8f30d136497))
-
 ## [0.6.0] - 2026-07-07
 
 This release documents how to use the crate as `[dev-dependency]`.
