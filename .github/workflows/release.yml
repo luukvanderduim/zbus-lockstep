@@ -29,7 +29,7 @@ jobs:
         with:
           tool: git-cliff
 
-      # Genereer de changelog
+      # Generate the changelog
       - name: Generate Changelog
         run: git-cliff --config cliff.toml --latest --strip header -o NEW_CHANGELOG.md
 
