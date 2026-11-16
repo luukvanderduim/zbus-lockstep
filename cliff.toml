@@ -50,29 +50,35 @@ commit_preprocessors = [
 ]
 # regex for parsing and grouping commits
 commit_parsers = [
-  { message = "^🎉|^:tada:", group = "<!-- 0 -->🎉 Begin project" },
-  { message = "^feat|^✨|^:sparkles:", group = "<!-- 1 -->✨ Features" },
-  { message = "^💥|^:boom:", group = "<!-- 2 -->💥 Breaking change" },
-  { message = "^fix|^🐛|^:bug:|^🚑️|^:ambulance:|^🩹|^:adhesive_bandage:", group = "<!-- 3 -->🐛 Fixes" },
-  { message = "^doc|^📝|^:memo:", group = "<!-- 4 -->📝 Documentation" },
-  { message = "^perf|^⚡|^:zap:", group = "<!-- 5 -->⚡ Performance" },
-  { message = "^refactor|^♻️|^:recycle:|^🚚|^:truck:", group = "<!-- 6 -->♻️ Refactor / Move files" },
-  { message = "^style|^💄|^:lipstick:|^🎨|^:art:", group = "<!-- 7 -->💄 Art and Style" },
-  { message = "^test|^✅|^:white_check_mark:|^🧪|^:test_tube:|^🦺|^:safety_vest:", group = "<!-- 8 -->✅ Testing and validation" },
-  { message = "^chore\\(release\\): prepare for", skip = true },
-  { message = "^chore\\(deps.*\\)", skip = true },
-  { message = "^chore\\(pr\\)", skip = true },
-  { message = "^chore\\(pull\\)", skip = true },
-  { message = "^chore|^ci|^⚙️|^:gear:", group = "<!-- 9 -->⚙️ Miscellaneous Tasks" },
-  { message = ".*🔒️|.*🔐|.*:lock:|.*:key:", group = "<!-- 10 -->🔒️ Security / Secrets" },
-  { message = "^⏪️|^:rewind:|^🔥|^:fire:", group = "<!-- 11 -->⏪️ Revert / Remove" },
-  { message = "^alien|^👽️|^:alien:", group = "<!-- 13 -->👽️ External API changes" },
-  { message = "^wheelchair|^♿️|^:wheelchair:", group = "<!-- 15 -->♿️ Accessibility" },
-  { message = "^children_crossing|^🚸|^:children_crossing:", group = "<!-- 16 -->🚸 Improve UX" },
-  { message = "^iphone|^🧑‍💻|^:technologist:", group = "<!-- 17 -->🧑‍💻 Improve DX" },
-  { message = "^triangular_flag_on_post|^🚩|^:triangular_flag_on_post:", group = "<!-- 18 -->🚩 Feature flags" },
-  { message = "^thread|^🧵|^:thread:", group = "<!-- 19 -->🧵 Multithreading / Concurrency" },
+  # NOTE: first match wins — keep the narrow skip rules above the broad ones.
+  # `(?:\S+\s+)?` tolerates a leading emoji token, `(?i)` ignores case.
+
+  { message = '(?i)^(?:\S+\s+)?chore\((release|deps|pr|pull)', skip = true },
+
+  { message = '💥|^:boom:', group = "<!-- 2 -->💥 Breaking change" },
+  { message = '^🎉|^:tada:|(?i)^initial commit', group = "<!-- 0 -->🎉 Begin project" },
+  { message = '🔒️|🔐|:lock:|:key:', group = "<!-- 10 -->🔒️ Security / Secrets" },
+
+  { message = '(?i)^(?:\S+\s+)?feat|^✨|^:sparkles:', group = "<!-- 1 -->✨ Features" },
+  { message = '(?i)^(?:\S+\s+)?fix|^🐛|^:bug:|^🚑️|^:ambulance:|^🩹|^:adhesive_bandage:', group = "<!-- 3 -->🐛 Fixes" },
+  { message = '(?i)^(?:\S+\s+)?docs?|^📝|^:memo:', group = "<!-- 4 -->📝 Documentation" },
+  { message = '(?i)^(?:\S+\s+)?perf|^⚡|^:zap:', group = "<!-- 5 -->⚡ Performance" },
+  { message = '(?i)^(?:\S+\s+)?refactor|^♻️|^:recycle:|^🚚|^:truck:', group = "<!-- 6 -->♻️ Refactor / Move files" },
+  { message = '(?i)^(?:\S+\s+)?style|^💄|^:lipstick:|^🎨|^:art:', group = "<!-- 7 -->💄 Art and Style" },
+  { message = '(?i)^(?:\S+\s+)?tests?|^✅|^:white_check_mark:|^🧪|^:test_tube:|^🦺|^:safety_vest:', group = "<!-- 8 -->✅ Testing and validation" },
+
+  { message = '⬆️|(?i)^(?:\S+\s+)?(deps|dependencies)', group = "<!-- 12 -->⬆️ Dependencies" },
+  { message = '(?i)^(?:\S+\s+)?(build|ci|chore)|^⚙️|^:gear:', group = "<!-- 9 -->⚙️ Miscellaneous Tasks" },
+
+  { message = '^⏪️|^:rewind:|🔥|^:fire:', group = "<!-- 11 -->⏪️ Revert / Remove" },
+  { message = '(?i)^(?:\S+\s+)?alien|^👽️|^:alien:', group = "<!-- 13 -->👽️ External API changes" },
+  { message = '(?i)^(?:\S+\s+)?wheelchair|^♿️|^:wheelchair:', group = "<!-- 15 -->♿️ Accessibility" },
+  { message = '(?i)^(?:\S+\s+)?children_crossing|^🚸|^:children_crossing:', group = "<!-- 16 -->🚸 Improve UX" },
+  { message = '(?i)^(?:\S+\s+)?iphone|^🧑‍💻|^:technologist:', group = "<!-- 17 -->🧑‍💻 Improve DX" },
+  { message = '(?i)^(?:\S+\s+)?triangular_flag_on_post|^🚩|^:triangular_flag_on_post:', group = "<!-- 18 -->🚩 Feature flags" },
+  { message = '(?i)^(?:\S+\s+)?thread|^🧵|^:thread:', group = "<!-- 19 -->🧵 Multithreading / Concurrency" },
 ]
+
 # protect breaking changes from being skipped due to matching a skipping commit_parser
 protect_breaking_commits = false
 # filter out the commits that are not matched by commit parsers
